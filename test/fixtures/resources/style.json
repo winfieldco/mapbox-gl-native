@@ -22,7 +22,16 @@
     "layout": {
       "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
       "text-field": "{name_en}"
-    }
+    }},
+    {
+      "id": "background",
+      "type": "background",
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "background-color": "#eee"
+      }
   }, {
     "id": "poi",
     "type": "symbol",

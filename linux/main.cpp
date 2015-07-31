@@ -1,6 +1,8 @@
 #include <mbgl/mbgl.hpp>
 #include "../platform/default/default_styles.hpp"
+#include "../test/fixtures/mock_file_source.hpp"
 #include <mbgl/util/uv.hpp>
+#include <mbgl/util/io.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/default/settings_json.hpp>
@@ -14,6 +16,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
+#include <unistd.h>
 
 namespace {
 
@@ -102,15 +105,13 @@ int main(int argc, char *argv[]) {
 
     view = std::make_unique<GLFWView>(fullscreen, benchmark);
 
-    mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
-    mbgl::DefaultFileSource fileSource(&cache);
+
+    mbgl::MockFileSource fileSource(mbgl::MockFileSource::Success, "");
 
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
     if (token == nullptr) {
         mbgl::Log::Warning(mbgl::Event::Setup, "no access token set. mapbox.com tiles won't work.");
-    } else {
-        fileSource.setAccessToken(std::string(token));
     }
 
     mbgl::Map map(*view, fileSource);
@@ -149,8 +150,10 @@ int main(int argc, char *argv[]) {
         view->setWindowTitle(newStyle.second);
     }
 
+    //map.setStyleJSON(mbgl::util::read_file(style), "");
     map.setStyleURL(style);
-
+    view->addRandomPointAnnotations(1);
+    //view->addRandomShapeAnnotations(5);
     view->run();
 
     // Save settings

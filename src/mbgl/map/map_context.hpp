@@ -65,6 +65,7 @@ public:
 
     // Style::Observer implementation.
     void onTileDataChanged() override;
+    void onStyleParsed() override {}
     void onResourceLoadingFailed(std::exception_ptr error) override;
 
 private:

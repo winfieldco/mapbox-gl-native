@@ -57,6 +57,8 @@ void Style::setJSON(const std::string& json, const std::string&) {
         source->setObserver(this);
         source->load();
     }
+
+    emitStyleParsed();
 }
 
 Style::~Style() {
@@ -197,6 +199,14 @@ void Style::onSpriteLoaded(const Sprites& sprites) {
 
 void Style::onSpriteLoadingFailed(std::exception_ptr error) {
     emitResourceLoadingFailed(error);
+}
+
+void Style::emitStyleParsed() {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    if (observer) {
+        observer->onStyleParsed();
+    }
 }
 
 void Style::emitTileDataChanged() {

@@ -35,6 +35,7 @@ LiveTileData::LiveTileData(const TileID& id_,
 
     workRequest = worker.parseLiveTile(tileWorker, *tile, [this, callback] (TileParseResult result) {
         if (result.is<State>()) {
+        printf("not tile\n");
             state = result.get<State>();
         } else {
             error = result.get<std::string>();

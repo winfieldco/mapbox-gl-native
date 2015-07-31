@@ -17,8 +17,11 @@
         '../mbgl.gyp:copy_certificate_bundle',
       ],
 
+      'include_dirs': [ '../include', '../src', '../platform/default' ],
       'sources': [
         'main.cpp',
+        '../test/fixtures/mock_file_source.cpp',
+        '../test/fixtures/mock_file_source.hpp',
         '../platform/default/settings_json.cpp',
         '../platform/default/glfw_view.hpp',
         '../platform/default/glfw_view.cpp',

@@ -40,6 +40,7 @@ public:
     public:
         virtual ~Observer() = default;
 
+        virtual void onStyleParsed() = 0;
         virtual void onTileDataChanged() = 0;
         virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
     };
@@ -91,6 +92,7 @@ private:
     void onSpriteLoaded(const Sprites& sprites) override;
     void onSpriteLoadingFailed(std::exception_ptr error) override;
 
+    void emitStyleParsed();
     void emitTileDataChanged();
     void emitResourceLoadingFailed(std::exception_ptr error);
 

@@ -1,4 +1,3 @@
-#include "../fixtures/util.hpp"
 #include "mock_file_source.hpp"
 
 #include <mbgl/storage/request.hpp>
@@ -116,7 +115,7 @@ void MockFileSource::Impl::handleRequest(Request* req) {
         replyWithCorruptedData(req);
         break;
     default:
-        EXPECT_TRUE(false) << "Should never be reached.";
+        break;
     }
 }
 
