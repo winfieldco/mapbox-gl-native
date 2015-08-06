@@ -37,6 +37,7 @@ header = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 #define MBGL_VERSION_MINOR {minor}
 #define MBGL_VERSION_PATCH {patch}
 #define MBGL_VERSION_REV "{rev}"
+#define MBGL_VERSION_USER_AGENT "MapboxGL/{major}.{minor} ({patch})"
 
 namespace mbgl {{
 namespace version {{
@@ -45,6 +46,7 @@ extern const int major, minor, patch;
 extern const char *revision;
 extern const char *string;
 extern const unsigned int number;
+extern const char* userAgent;
 
 }}
 }}
@@ -60,4 +62,3 @@ extern const unsigned int number;
 header_path = os.path.join(output_dir, 'include/mbgl/util/version.hpp')
 mkdir_p(os.path.dirname(header_path))
 with open(header_path, 'w') as f: f.write(header)
-

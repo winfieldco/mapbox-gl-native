@@ -9,6 +9,7 @@ const int patch = MBGL_VERSION_PATCH;
 const char *revision = MBGL_VERSION_REV;
 const char *string = MBGL_VERSION_STRING;
 const unsigned int number = MBGL_VERSION;
+const char* userAgent = MBGL_VERSION_USER_AGENT;
 
 }
 }

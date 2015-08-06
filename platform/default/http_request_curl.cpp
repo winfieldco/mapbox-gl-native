@@ -8,6 +8,7 @@
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/version.hpp>
 
 #include <curl/curl.h>
 
@@ -475,7 +476,7 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
 #else
     handleError(curl_easy_setopt(handle, CURLOPT_ENCODING, "gzip, deflate"));
 #endif
-    handleError(curl_easy_setopt(handle, CURLOPT_USERAGENT, "MapboxGL/1.0"));
+    handleError(curl_easy_setopt(handle, CURLOPT_USERAGENT, mbgl::version::userAgent));
     handleError(curl_easy_setopt(handle, CURLOPT_SHARE, context->share));
 
     start();

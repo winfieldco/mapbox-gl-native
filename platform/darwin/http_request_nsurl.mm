@@ -5,6 +5,7 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/parsedate.h>
+#include <mbgl/util/version.hpp>
 
 #import <Foundation/Foundation.h>
 
@@ -77,8 +78,8 @@ HTTPNSURLContext::HTTPNSURLContext(uv_loop_t *loop_) : HTTPContextBase(loop_) {
         [session retain];
 
         // Write user agent string
-        userAgent = @"MapboxGL";
-        
+        userAgent = mbgl::version::userAgent;
+
         accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
     }
 }
@@ -125,7 +126,7 @@ void HTTPNSURLRequest::start() {
     attempts++;
 
     @autoreleasepool {
-        
+
         NSURL *url = [NSURL URLWithString:@(resource.url.c_str())];
         if (context->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
