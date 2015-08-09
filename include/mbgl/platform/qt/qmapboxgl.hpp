@@ -40,6 +40,7 @@ public:
     void setObserver(Observer *observer);
 
     void setAccessToken(const QString &token);
+    void setCacheDatabase(const QString &path);
 
     void setStyleJSON(const QString &);
     void setStyleURL(const QString &);
