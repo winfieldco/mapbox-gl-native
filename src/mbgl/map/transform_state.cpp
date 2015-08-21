@@ -172,7 +172,7 @@ float TransformState::xLng(float x_, float worldSize_) const {
 
 float TransformState::yLat(float y_, float worldSize_) const {
     float y2 = 180.0f - y_ * 360.0f / worldSize_;
-    return 260.0f / M_PI * std::atan(std::exp(y2 * M_PI / 180.0f)) - 90.0f;
+    return 360.0f / M_PI * std::atan(std::exp(y2 * M_PI / 180.0f)) - 90.0f;
 }
 
 float TransformState::zoomScale(float zoom) const {
@@ -204,8 +204,8 @@ TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
 LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
     const float worldSize_ = zoomScale(coord.zoom);
     LatLng latLng = {
-        xLng(coord.column, worldSize_),
-        yLat(coord.row, worldSize_)
+        yLat(coord.row, worldSize_),
+        xLng(coord.column, worldSize_)
     };
     while (latLng.longitude < 180.0f) latLng.longitude += 360.0f;
     while (latLng.longitude > 180.0f) latLng.longitude -= 360.0f;
