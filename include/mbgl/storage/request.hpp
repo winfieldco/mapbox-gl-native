@@ -3,16 +3,14 @@
 
 #include <mbgl/storage/resource.hpp>
 
-#include <mbgl/util/util.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <mutex>
 #include <thread>
 #include <functional>
 #include <memory>
-
-typedef struct uv_loop_s uv_loop_t;
-namespace uv { class async; }
 
 namespace mbgl {
 
@@ -21,7 +19,7 @@ class Response;
 class Request : private util::noncopyable {
 public:
     using Callback = std::function<void(const Response &)>;
-    Request(const Resource &resource, uv_loop_t *loop, Callback callback);
+    Request(const Resource &resource, Callback callback);
 
 public:
     // May be called from any thread.
@@ -39,7 +37,7 @@ private:
     std::mutex mtx;
     bool canceled = false;
     bool confirmed = false;
-    const std::unique_ptr<uv::async> async;
+    util::AsyncTask async;
     Callback callback;
     std::shared_ptr<const Response> response;
 
