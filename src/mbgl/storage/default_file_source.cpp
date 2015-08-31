@@ -39,7 +39,7 @@ DefaultFileSource::~DefaultFileSource() {
     MBGL_VERIFY_THREAD(tid);
 }
 
-Request* DefaultFileSource::request(const Resource& resource, uv_loop_t*, Callback callback) {
+Request* DefaultFileSource::request(const Resource& resource, Callback callback) {
     if (!callback) {
         throw util::MisuseException("FileSource callback can't be empty");
     }
