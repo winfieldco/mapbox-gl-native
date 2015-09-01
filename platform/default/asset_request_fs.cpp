@@ -65,7 +65,7 @@ AssetRequest::AssetRequest(const Resource& resource_, Callback callback_, const 
         path = assetRoot + "/" + mbgl::util::percentDecode(url.substr(8));
     }
 
-    auto loop = util::RunLoop::getLoop();
+    auto loop = reinterpret_cast<uv_loop_t*>(util::RunLoop::getLoopHandle());
     uv_fs_open(loop, &req, path.c_str(), O_RDONLY, S_IRUSR, fileOpened);
 }
 

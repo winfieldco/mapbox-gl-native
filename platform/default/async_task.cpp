@@ -12,8 +12,8 @@ namespace util {
 class AsyncTask::Impl {
 public:
     Impl(std::function<void()>&& fn)
-        : async(RunLoop::getLoop(), [this] { received(); })
-        , timer(RunLoop::getLoop())
+        : async(reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle()), [this] { received(); })
+        , timer(reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle()))
         , task(std::move(fn)) {
     }
 

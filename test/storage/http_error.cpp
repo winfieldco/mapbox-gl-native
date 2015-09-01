@@ -1,10 +1,10 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/run_loop.hpp>
+
+#include <uv.h>
 
 #include <cmath>
 
@@ -14,7 +14,7 @@ TEST_F(Storage, HTTPTemporaryError) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
+    util::RunLoop loop;
 
     const auto start = uv_hrtime();
 
@@ -52,7 +52,7 @@ TEST_F(Storage, HTTPTemporaryError) {
         }
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST_F(Storage, HTTPConnectionError) {
@@ -61,7 +61,7 @@ TEST_F(Storage, HTTPConnectionError) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
+    util::RunLoop loop;
 
     const auto start = uv_hrtime();
 
@@ -99,5 +99,5 @@ TEST_F(Storage, HTTPConnectionError) {
         counter++;
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

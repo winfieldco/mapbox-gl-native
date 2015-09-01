@@ -187,7 +187,7 @@ private:
 class SpriteTest : public testing::Test {
 protected:
     void runTest(const SpriteParams& params, FileSource* fileSource, SpriteTestCallback callback) {
-        util::RunLoop loop(uv_default_loop());
+        util::RunLoop loop;
 
         async_ = std::make_unique<util::AsyncTask>([&] { loop.stop(); });
         async_->unref();
@@ -197,7 +197,7 @@ protected:
         util::Thread<SpriteThread> tester(context, fileSource, callback);
         tester.invoke(&SpriteThread::loadSprite, params);
 
-        uv_run(loop.get(), UV_RUN_DEFAULT);
+        loop.run();
 
         tester.invoke(&SpriteThread::unloadSprite);
     }

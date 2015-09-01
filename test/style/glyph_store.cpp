@@ -54,7 +54,7 @@ private:
 class GlyphStoreTest : public testing::Test {
 protected:
     void runTest(const GlyphStoreParams& params, FileSource* fileSource, GlyphStoreTestCallback callback) {
-        util::RunLoop loop(uv_default_loop());
+        util::RunLoop loop;
 
         async_ = std::make_unique<util::AsyncTask>([&]{ loop.stop(); });
         async_->unref();
@@ -64,7 +64,7 @@ protected:
         util::Thread<GlyphStoreThread> tester(context, fileSource, callback);
         tester.invoke(&GlyphStoreThread::loadGlyphStore, params);
 
-        uv_run(loop.get(), UV_RUN_DEFAULT);
+        loop.run();
 
         tester.invoke(&GlyphStoreThread::unloadGlyphStore);
     }

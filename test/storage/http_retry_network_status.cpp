@@ -19,7 +19,7 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
+    util::RunLoop loop;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
 
@@ -48,7 +48,7 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     uv::timer delayTimer(uv_default_loop());
     delayTimer.start(300, 0, [] () {});
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 // Tests that a change in network status preempts requests that failed due to connection or
@@ -59,7 +59,7 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
     using namespace mbgl;
 
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
+    util::RunLoop loop;
 
     const auto start = uv_hrtime();
 
@@ -107,5 +107,5 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
         mbgl::NetworkStatus::Reachable();
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

@@ -9,7 +9,7 @@ namespace util {
 class Timer::Impl {
 public:
     Impl()
-        : timer(RunLoop::getLoop()) {
+        : timer(reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle())) {
         timer.unref();
     }
 

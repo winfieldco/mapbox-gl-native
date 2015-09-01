@@ -11,9 +11,11 @@
 
       'sources': [
         '../platform/default/async_task.cpp',
+        '../platform/default/run_loop.cpp',
         '../platform/default/timer.cpp',
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
+        '../platform/default/run_loop.cpp',
         '../platform/default/application_root.cpp',
         '../platform/default/asset_root.cpp',
         '../platform/default/thread.cpp',
