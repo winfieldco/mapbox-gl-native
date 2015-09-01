@@ -15,11 +15,11 @@
         '../include/mbgl/platform/qt/qmapboxgl.hpp',
         '../platform/default/application_root.cpp',
         '../platform/default/asset_root.cpp',
-        '../platform/default/async_task.cpp',
         '../platform/default/log_stderr.cpp',
-        '../platform/default/run_loop.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/thread.cpp',
+        '../platform/qt/async_task.cpp',
+        '../platform/qt/async_task_p.hpp',
         '../platform/qt/image.cpp',
         '../platform/qt/qfilesource_p.cpp',
         '../platform/qt/qfilesource_p.hpp',
@@ -27,6 +27,9 @@
         '../platform/qt/qmapboxgl_p.hpp',
         '../platform/qt/qsqlitecache_p.cpp',
         '../platform/qt/qsqlitecache_p.hpp',
+        '../platform/qt/run_loop.cpp',
+        '../platform/qt/timer.cpp',
+        '../platform/qt/timer_p.hpp',
       ],
 
       'variables': {
