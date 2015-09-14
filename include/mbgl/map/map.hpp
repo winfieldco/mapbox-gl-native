@@ -98,6 +98,7 @@ public:
     // Camera
     void jumpTo(CameraOptions options);
     void easeTo(CameraOptions options);
+    void flyTo(CameraOptions options);
 
     // Position
     void moveBy(double dx, double dy, const Duration& = Duration::zero());

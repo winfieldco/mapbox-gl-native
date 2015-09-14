@@ -25,6 +25,7 @@ public:
 
     void jumpTo(const CameraOptions options);
     void easeTo(const CameraOptions options);
+    void flyTo(const CameraOptions options);
 
     // Position
     void moveBy(double dx, double dy, const Duration& = Duration::zero());

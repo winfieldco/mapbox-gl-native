@@ -127,6 +127,11 @@ void Map::easeTo(CameraOptions options) {
     update(options.zoom ? Update::Zoom : Update::Repaint);
 }
 
+void Map::flyTo(CameraOptions options) {
+    transform->flyTo(options);
+    update(Update::Zoom);
+}
+
 #pragma mark - Position
 
 void Map::moveBy(double dx, double dy, const Duration& duration) {
