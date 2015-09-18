@@ -204,6 +204,8 @@ private:
     GLsizei currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
+    
+    GLuint gridTextureBinding;
 
 public:
     FrameHistory frameHistory;
@@ -247,6 +249,7 @@ public:
     };
 
     VertexArrayObject coveringPlainArray;
+    VertexArrayObject coveringPatternArray;
     VertexArrayObject coveringRasterArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.

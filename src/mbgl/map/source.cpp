@@ -183,6 +183,19 @@ void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transf
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
     }
 }
+    
+bool Source::viewportTileParsed() {
+    bool parsed = false;
+    
+    for (auto &pair : tiles) {
+        TileID id = pair.first;
+        if (TileData::isReadyState(hasTile(id))) {
+            parsed = true;
+        }
+    }
+    
+    return parsed;
+}
 
 void Source::drawClippingMasks(Painter &painter) {
     for (const auto& pair : tiles) {
@@ -345,7 +358,7 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
 
     return covering_tiles;
 }
-
+    
 /**
  * Recursively find children of the given tile that are already loaded.
  *

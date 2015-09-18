@@ -80,6 +80,7 @@ public:
     void invalidateTiles(const std::unordered_set<TileID, TileID::Hash>&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
+    bool viewportTileParsed();
     void drawClippingMasks(Painter &painter);
     void finishRender(Painter &painter);
 
