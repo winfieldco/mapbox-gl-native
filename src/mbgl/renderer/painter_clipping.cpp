@@ -95,36 +95,10 @@ void Painter::drawClippingMasks(const std::set<Source*>& sources) {
 
             
         }
-        
-        // sprite upload
-        //_mbglMap->setSprite(cSymbolName, cSpriteImage);
-        
-        // No viewport tiles are parsed. Draw the grid pattern.
-        //const std::shared_ptr<Sprite> &sprite = style.sprite;
-        //if (cSpriteImage) {
+
         {
-            //SpriteAtlasElement spriteAtlasElement = spriteAtlas->getImage("matte-256", FALSE);
-            //Rect<uint16_t> imagePos = spriteAtlasElement.pos;
-            
-            /*std::array<float, 2> imageSize = {{
-                (float)(imagePos.w * 0.5),
-                (float)(imagePos.h * 0.5)
-            }
-            };*/
-            
             useProgram(patternShader->program);
 
-            /*patternShader->setPatternSize(imageSize);
-            patternShader->setPatternTopLeft({{
-                float(imagePos.x) / spriteAtlas.getWidth(),
-                float(imagePos.y) / spriteAtlas.getHeight(),
-            }});
-            patternShader->setPatternBottomRight({{
-                float(imagePos.x + imagePos.w) / spriteAtlas.getWidth(),
-                float(imagePos.y + imagePos.h) / spriteAtlas.getHeight(),
-            }});
-            std::array<float, 4> color = {{ 1, 1, 1, 1 }};
-            patternShader->setColor(color);*/
             patternShader->u_pattern_tl_a = {{0.0f, 0.0f}};
             patternShader->u_pattern_br_a = {{1.0f, 1.0f}};
             patternShader->u_opacity = 1.0f;
