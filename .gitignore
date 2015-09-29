@@ -25,10 +25,12 @@
 /test/fixtures/api/1.png
 /test/fixtures/api/2.png
 /test/fixtures/database/*.db
+/test/output
 /include/mbgl/shader/shaders.hpp
 /src/shader/shaders_gl.cpp
 /src/shader/shaders_gles2.cpp
 /bin/style.bin.js
+/node_modules
 *~
 
 /ios/benchmark/assets/tiles/mapbox.mapbox-streets-v6/
