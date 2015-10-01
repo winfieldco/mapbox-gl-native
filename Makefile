@@ -59,9 +59,9 @@ endif
 
 .PHONY: linux run-linux run-valgrind-linux
 linux: ; $(RUN) Makefile/linuxapp
-run-linux: linux ; (cd build/linux-x86_64/$(BUILDTYPE) && ./mapbox-gl)
+run-linux: linux ; (cd build/$(BUILD)-$(BUILD_VERSION)/$(BUILDTYPE) && ./mapbox-gl)
 run-valgrind-linux: linux
-	(cd build/linux-x86_64/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-gl)
+	(cd build/$(BUILD)-$(BUILD_VERSION)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-gl)
 
 .PHONY: android android-lib
 # Builds a particular android architecture.
