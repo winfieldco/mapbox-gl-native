@@ -189,6 +189,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
     private int mGpsMarkerOffset;
+    private Matrix mGpsRotationMatrix;
     private Location mGpsLocation;
 
     // Used for the compass
@@ -663,7 +664,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
         mGpsMarker.setLayoutParams(lp);
         mGpsMarker.setImageResource(R.drawable.location_marker);
+        mGpsMarker.setScaleType(ImageView.ScaleType.MATRIX);
         mGpsMarker.setVisibility(View.INVISIBLE);
+        mGpsRotationMatrix = new Matrix();
         mGpsMarkerOffset = (int) iconSize / 2;
         addView(mGpsMarker);
 
@@ -2827,7 +2830,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             // Update Location
             mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
             mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
-            rotateImageView(mGpsMarker, 0.0f);
+
+            // Rotate GPS
+            mGpsRotationMatrix.postRotate(0.0f /* angle */, mGpsMarkerOffset, mGpsMarkerOffset);
+            mGpsMarker.setImageMatrix(mGpsRotationMatrix);
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
