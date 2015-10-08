@@ -144,9 +144,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Used for loading default marker sprite
     private static final String DEFAULT_SPRITE = "com.mapbox.sprites.default";
-    
-    // Used for low pass filtering location updates
-    private static final float PREVIOUS_LOCATION_WEIGHT = 0.70f;
 
     /**
      * The currently supported maximum zoom level.
@@ -2820,15 +2817,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // Handles location updates from GPS
     private void updateLocation(Location location) {
         if (location != null) {
-            if(mGpsLocation!=null) {
-                // low pass filter using previous location
-                double lat = mGpsLocation.getLatitude() * PREVIOUS_LOCATION_WEIGHT;
-                double lng = mGpsLocation.getLongitude() * PREVIOUS_LOCATION_WEIGHT;
-                lat += (1 - PREVIOUS_LOCATION_WEIGHT) * location.getLatitude();
-                lng += (1 - PREVIOUS_LOCATION_WEIGHT) * location.getLongitude();
-                location.setLatitude(lat);
-                location.setLongitude(lng);
-            }
             mGpsLocation = location;
             updateGpsMarker();
         }
