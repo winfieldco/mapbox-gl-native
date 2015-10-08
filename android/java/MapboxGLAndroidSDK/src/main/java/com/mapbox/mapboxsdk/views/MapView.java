@@ -188,6 +188,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private LostApiClient mLocationClient;
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
+    private int mGpsMarkerOffset;
     private Location mGpsLocation;
 
     // Used for the compass
@@ -658,8 +659,12 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
         // Setup user location UI
         mGpsMarker = new ImageView(getContext());
+        float iconSize = 27.0f * mScreenDensity;
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
+        mGpsMarker.setLayoutParams(lp);
         mGpsMarker.setImageResource(R.drawable.location_marker);
         mGpsMarker.setVisibility(View.INVISIBLE);
+        mGpsMarkerOffset = (int) iconSize / 2;
         addView(mGpsMarker);
 
         // Setup compass
@@ -2815,19 +2820,14 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     private void updateGpsMarker() {
-        if (isMyLocationEnabled() && mGpsLocation != null) {
+        if (mIsMyLocationEnabled && mGpsLocation != null) {
             mGpsMarker.setVisibility(View.VISIBLE);
-            LatLng coordinate = new LatLng(mGpsLocation);
-            PointF screenLocation = toScreenLocation(coordinate);
+            PointF screenLocation = toScreenLocation(new LatLng(mGpsLocation));
 
-            float iconSize = 27.0f * mScreenDensity;
             // Update Location
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) iconSize, (int) iconSize);
-            lp.leftMargin = (int) (screenLocation.x - iconSize / 2.0f);
-            lp.topMargin = (int) (screenLocation.y + iconSize / 2.0f);
-            mGpsMarker.setLayoutParams(lp);
+            mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
+            mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
             rotateImageView(mGpsMarker, 0.0f);
-            mGpsMarker.requestLayout();
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
