@@ -117,12 +117,13 @@ final class CompassView extends ImageView implements SensorEventListener {
             SensorManager.getOrientation(mMatrixR, mMatrixValues);
             mGpsLocation = mCompassDelegate.getLocation();
             if (mGpsLocation != null) {
-                mGeomagneticField = new GeomagneticField(
-                        (float) mGpsLocation.getLatitude(),
-                        (float) mGpsLocation.getLongitude(),
-                        (float) mGpsLocation.getAltitude(),
-                        System.currentTimeMillis());
-                mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + mGeomagneticField.getDeclination();
+                // FIXME not sure about if this is correctly calculated. it seems that it reacts when you tilt the device
+//                mGeomagneticField = new GeomagneticField(
+//                        (float) mGpsLocation.getLatitude(),
+//                        (float) mGpsLocation.getLongitude(),
+//                        (float) mGpsLocation.getAltitude(),
+//                        System.currentTimeMillis());
+//                mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + mGeomagneticField.getDeclination();
                 mCompassValid = true;
             }
         }
