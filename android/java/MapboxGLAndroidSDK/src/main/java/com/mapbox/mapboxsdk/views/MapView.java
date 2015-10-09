@@ -2296,8 +2296,12 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             // Rotate the map
             double bearing = mNativeMapView.getBearing();
             bearing += detector.getRotationDegreesDelta();
-            mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
 
+            if (mUserLocationTrackingMode == TRACKING_NONE) {
+                mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+            } else {
+                mNativeMapView.setBearing(bearing, mGpsMarker.getX() - 2 * mGpsMarkerOffset, mGpsMarker.getY() - mGpsMarkerOffset);
+            }
             return true;
         }
     }
@@ -2844,28 +2848,33 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     private void updateGpsMarker() {
         if (mIsMyLocationEnabled && mGpsLocation != null) {
-
             mGpsMarker.setVisibility(View.VISIBLE);
-            PointF screenLocation = toScreenLocation(new LatLng(mGpsLocation.getLatitude(), mGpsLocation.getLongitude()));
+            LatLng location = new LatLng(mGpsLocation.getLatitude(), mGpsLocation.getLongitude());
+            PointF screenLocation = toScreenLocation(location);
 
             // Update marker
-            if (!mDirty) {
-                mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
-                mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
-            } else {
-                if(mGpsMarkerAnimatorX != null){
-                    mGpsMarkerAnimatorX.cancel();
-                    mGpsMarkerAnimatorY.cancel();
+            if (mUserLocationTrackingMode == TRACKING_NONE) {
+                if (!mDirty) {
+                    mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
+                    mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
+                } else {
+                    if (mGpsMarkerAnimatorX != null) {
+                        mGpsMarkerAnimatorX.cancel();
+                        mGpsMarkerAnimatorY.cancel();
+                    }
+                    mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
+                    mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
                 }
-                mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
-                mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
             }
 
             // Rotate marker
-            if(mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS && mCompassView.isValid()){
-                updateGpsMarkerBearing(mCompassView.getBearing());
-            } else if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS && mGpsLocation.hasBearing()) {
-                updateGpsMarkerBearing(mGpsLocation.getBearing());
+            if (mUserLocationTrackingMode != TRACKING_NONE) {
+                setCenterCoordinate(location);
+                if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS && mCompassView.isValid()) {
+                    updateGpsMarkerBearing(mCompassView.getBearing());
+                } else if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS && mGpsLocation.hasBearing()) {
+                    updateGpsMarkerBearing(mGpsLocation.getBearing());
+                }
             }
 
         } else {
@@ -2888,16 +2897,20 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     public void setUserLocationTrackingMode(@UserLocationTrackingMode int userLocationTrackingMode) {
-        mUserLocationTrackingMode = userLocationTrackingMode;
-        updateGpsMarkerImage();
-    }
-
-    private void updateGpsMarkerImage() {
-        if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS || mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS) {
-            mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
-        } else {
+        if (userLocationTrackingMode == TRACKING_NONE) {
+            mScrollEnabled = true;
             mGpsMarker.setImageResource(R.drawable.location_marker);
+        } else {
+            // tracking user
+            mScrollEnabled = false;
+            if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS || mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS) {
+                mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
+            }
+            mGpsMarker.setX(getWidth() / 2 - mGpsMarkerOffset);
+            mGpsMarker.setY(getHeight() / 2 - mGpsMarkerOffset);
         }
+        mUserLocationTrackingMode = userLocationTrackingMode;
+        updateGpsMarker();
     }
 
     //
