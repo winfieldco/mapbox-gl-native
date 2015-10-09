@@ -2869,7 +2869,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
             // Rotate marker
             if (mUserLocationTrackingMode != TRACKING_NONE) {
-                setCenterCoordinate(location);
+                setCenterCoordinate(location, true);
                 if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS && mCompassView.isValid()) {
                     updateGpsMarkerBearing(mCompassView.getBearing());
                 } else if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS && mGpsLocation.hasBearing()) {
