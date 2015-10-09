@@ -46,10 +46,12 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
+
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
@@ -196,6 +198,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private Matrix mGpsRotationMatrix;
     private Location mGpsLocation;
     private int mUserLocationTrackingMode;
+    private ViewPropertyAnimator mGpsMarkerAnimatorX;
+    private ViewPropertyAnimator mGpsMarkerAnimatorY;
 
     // Used for the compass
     private CompassView mCompassView;
@@ -2832,7 +2836,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Handles location updates from GPS
     private void updateLocation(Location location) {
-        if (location != null) {
+        if (location != null && !mDirty) {
             mGpsLocation = location;
             updateGpsMarker();
         }
@@ -2844,9 +2848,18 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mGpsMarker.setVisibility(View.VISIBLE);
             PointF screenLocation = toScreenLocation(new LatLng(mGpsLocation.getLatitude(), mGpsLocation.getLongitude()));
 
-            // Update Location
-            mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
-            mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
+            // Update marker
+            if (!mDirty) {
+                mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
+                mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
+            } else {
+                if(mGpsMarkerAnimatorX != null){
+                    mGpsMarkerAnimatorX.cancel();
+                    mGpsMarkerAnimatorY.cancel();
+                }
+                mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
+                mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
+            }
 
             // Rotate marker
             if(mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS && mCompassView.isValid()){
