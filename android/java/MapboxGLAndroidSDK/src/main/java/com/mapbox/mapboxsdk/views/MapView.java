@@ -2298,9 +2298,11 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             bearing += detector.getRotationDegreesDelta();
 
             if (mUserLocationTrackingMode == TRACKING_NONE) {
+                // Rotate around center of the gesture
                 mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
-                mNativeMapView.setBearing(bearing, mGpsMarker.getX() - 2 * mGpsMarkerOffset, mGpsMarker.getY() - mGpsMarkerOffset);
+                // Rotate around the center of the map
+                mNativeMapView.setBearing(bearing, mGpsMarker.getX() - mGpsMarkerOffset, mGpsMarker.getY() - mGpsMarkerOffset);
             }
             return true;
         }
@@ -2869,7 +2871,8 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
             // Rotate marker
             if (mUserLocationTrackingMode != TRACKING_NONE) {
-                setCenterCoordinate(location, true);
+                // fixme needs to be called with true, conflicts with gestures
+                setCenterCoordinate(location, false);
                 if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS && mCompassView.isValid()) {
                     updateGpsMarkerBearing(mCompassView.getBearing());
                 } else if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS && mGpsLocation.hasBearing()) {
