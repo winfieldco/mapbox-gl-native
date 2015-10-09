@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -66,6 +67,9 @@ import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,6 +195,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private int mGpsMarkerOffset;
     private Matrix mGpsRotationMatrix;
     private Location mGpsLocation;
+    private int mUserLocationTrackingMode;
 
     // Used for the compass
     private CompassView mCompassView;
@@ -388,6 +393,16 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             }
         }
     }
+
+    @IntDef({TRACKING_NONE, TRACKING_FOLLOW, TRACKING_FOLLOW_BEARING_GPS, TRACKING_FOLLOW_BEARING_COMPASS})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface UserLocationTrackingMode {
+    }
+
+    public static final int TRACKING_NONE = 0x00000000;
+    public static final int TRACKING_FOLLOW = 0x00000004;
+    public static final int TRACKING_FOLLOW_BEARING_GPS = 0x00000008;
+    public static final int TRACKING_FOLLOW_BEARING_COMPASS = 0x00000012;
 
     //
     // Interfaces
@@ -2805,6 +2820,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             }
         }
 
+
         onInvalidate();
     }
 
@@ -2832,13 +2848,42 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
             mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
 
-            // Rotate GPS
-            mGpsRotationMatrix.postRotate(0.0f /* angle */, mGpsMarkerOffset, mGpsMarkerOffset);
-            mGpsMarker.setImageMatrix(mGpsRotationMatrix);
+            // Rotate marker
+            if(mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS && mCompassView.isValid()){
+                updateGpsMarkerBearing(mCompassView.getBearing());
+            } else if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS && mGpsLocation.hasBearing()) {
+                updateGpsMarkerBearing(mGpsLocation.getBearing());
+            }
+
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
             }
+        }
+    }
+
+    private void updateGpsMarkerBearing(float bearing){
+        mGpsRotationMatrix = new Matrix();
+        mGpsRotationMatrix.postRotate(bearing, mGpsMarkerOffset, mGpsMarkerOffset);
+        mGpsMarker.setImageMatrix(mGpsRotationMatrix);
+        setDirection(-bearing, true);
+    }
+
+    @UserLocationTrackingMode
+    public int getUserLocationTrackingMode() {
+        return mUserLocationTrackingMode;
+    }
+
+    public void setUserLocationTrackingMode(@UserLocationTrackingMode int userLocationTrackingMode) {
+        mUserLocationTrackingMode = userLocationTrackingMode;
+        updateGpsMarkerImage();
+    }
+
+    private void updateGpsMarkerImage() {
+        if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS || mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS) {
+            mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
+        } else {
+            mGpsMarker.setImageResource(R.drawable.location_marker);
         }
     }
 

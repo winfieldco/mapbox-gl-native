@@ -295,19 +295,22 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), SecondMapActivity.class));
                                 return true;
 
-/*
                             case R.id.followNone:
-                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.NONE);
+                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_NONE);
                                 return true;
 
                             case R.id.followFollow:
-                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW);
+                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW);
                                 return true;
 
-                            case R.id.followBearing:
-                                mMapView.setUserLocationTrackingMode(MapView.UserLocationTrackingMode.FOLLOW_BEARING);
+                            case R.id.followBearingGps:
+                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING_GPS);
                                 return true;
-*/
+
+                            case R.id.followBearingCompass:
+                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING_COMPASS);
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }
