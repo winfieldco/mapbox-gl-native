@@ -2834,8 +2834,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 mGpsLocation = null;
             }
         }
-
-
         onInvalidate();
     }
 
@@ -2858,17 +2856,20 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng location = new LatLng(mGpsLocation.getLatitude(), mGpsLocation.getLongitude());
 
-            // Update marker
+            // Update marker if not tracking user
             if (mUserLocationTrackingMode == TRACKING_NONE) {
                 PointF screenLocation = toScreenLocation(location);
                 if (!mDirty) {
+                    // Map is idle, animate change of location
                     mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
                     mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
                 } else {
+                    // Map is undergoing changes, can't animate
                     if (mGpsMarkerAnimatorX != null) {
                         mGpsMarkerAnimatorX.cancel();
                         mGpsMarkerAnimatorY.cancel();
                     }
+                    // Reposition correctly
                     mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
                     mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
                 }
@@ -2884,7 +2885,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                     updateGpsMarkerBearing(mGpsLocation.getBearing());
                 }
             }
-
         } else {
             if (mGpsMarker != null) {
                 mGpsMarker.setVisibility(View.INVISIBLE);
@@ -2892,7 +2892,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         }
     }
 
-    private void updateGpsMarkerBearing(float bearing){
+    private void updateGpsMarkerBearing(float bearing) {
         mGpsRotationMatrix = new Matrix();
         mGpsRotationMatrix.postRotate(bearing, mGpsMarkerOffset, mGpsMarkerOffset);
         mGpsMarker.setImageMatrix(mGpsRotationMatrix);
@@ -2913,7 +2913,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mScrollEnabled = false;
             if (userLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS || userLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS) {
                 mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
-            }else{
+            } else {
                 mGpsMarker.setImageResource(R.drawable.location_marker);
             }
             mGpsMarker.setX(getWidth() / 2 - mGpsMarkerOffset);
