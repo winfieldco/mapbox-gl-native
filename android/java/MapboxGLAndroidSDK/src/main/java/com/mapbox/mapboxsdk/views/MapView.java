@@ -2903,8 +2903,11 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mGpsMarker.setImageResource(R.drawable.location_marker);
         } else {
             // tracking user
+            if(userLocationTrackingMode != TRACKING_FOLLOW){
+                mRotateEnabled = false;
+            }
+
             mScrollEnabled = false;
-            mRotateEnabled = false;
             if (userLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS || userLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS) {
                 mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
             } else {
