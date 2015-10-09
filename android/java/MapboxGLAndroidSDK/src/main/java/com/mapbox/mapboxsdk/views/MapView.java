@@ -137,6 +137,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private static final String STATE_ATTRIBUTION_MARGIN_RIGHT = "attrMarginRight";
     private static final String STATE_ATTRIBUTION_MARGIN_BOTTOM = "atrrMarginBottom";
     private static final String STATE_ATTRIBUTION_VISIBILITY = "atrrVisibility";
+    private static final String STATE_USER_LOCATION_TRACKING = "userLocationTracking";
 
     // Used for positioning views
     private static final float DIMENSION_SEVEN_DP = 7f;
@@ -844,6 +845,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                     , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_TOP)
                     , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_RIGHT)
                     , savedInstanceState.getInt(STATE_ATTRIBUTION_MARGIN_BOTTOM));
+
+            //noinspection ResourceType
+            setUserLocationTrackingMode(savedInstanceState.getInt(STATE_USER_LOCATION_TRACKING, TRACKING_NONE));
         }
 
         // Force a check for an access token
@@ -890,6 +894,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         outState.putStringArrayList(STATE_STYLE_CLASSES, new ArrayList<>(getStyleClasses()));
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
+        outState.putInt(STATE_USER_LOCATION_TRACKING, mUserLocationTrackingMode);
 
         // Compass
         LayoutParams compassParams = (LayoutParams) mCompassView.getLayoutParams();
