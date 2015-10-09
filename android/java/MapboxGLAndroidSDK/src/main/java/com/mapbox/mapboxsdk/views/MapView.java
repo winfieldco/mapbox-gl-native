@@ -2857,10 +2857,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         if (mIsMyLocationEnabled && mGpsLocation != null) {
             mGpsMarker.setVisibility(View.VISIBLE);
             LatLng location = new LatLng(mGpsLocation.getLatitude(), mGpsLocation.getLongitude());
-            PointF screenLocation = toScreenLocation(location);
 
             // Update marker
             if (mUserLocationTrackingMode == TRACKING_NONE) {
+                PointF screenLocation = toScreenLocation(location);
                 if (!mDirty) {
                     mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
                     mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
