@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.views;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
@@ -35,6 +37,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -73,6 +76,7 @@ import com.mapzen.android.lost.api.LostApiClient;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -84,10 +88,10 @@ import java.util.List;
  * You use this class to display map information and to manipulate the map contents from your application.
  * You can center the map on a given coordinate, specify the size of the area you want to display,
  * and style the features of the map to fit your application's use case.
- * <p/>
+ * <p>
  * Use of {@link MapView} requires a Mapbox API access token.
  * Obtain an access token on the <a href="https://www.mapbox.com/account/apps/">Mapbox account page</a>.
- * <p/>
+ * <p>
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
  *
@@ -196,6 +200,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
     private int mGpsMarkerOffset;
+    private Matrix mGpsRotationMatrix;
     private Location mGpsLocation;
     private int mUserLocationTrackingMode;
     private ViewPropertyAnimator mGpsMarkerAnimatorX;
@@ -253,7 +258,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * StyleUrls provides URLs to several professional styles designed by Mapbox.
-     * <p/>
+     * <p>
      * These styles are all ready to go in your app. To load one, pass it into {@link MapView#setStyleUrl(String)}
      *
      * @see MapView#setStyleUrl(String)
@@ -297,7 +302,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         /**
          * This event is triggered whenever the currently displayed map region is about to changing
          * without an animation.
-         * <p/>
+         * <p>
          * This event is followed by a series of {@link MapView.MapChange#RegionIsChanging} and ends
          * with {@link MapView.MapChange#RegionDidChange}.
          */
@@ -305,7 +310,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         /**
          * This event is triggered whenever the currently displayed map region is about to changing
          * with an animation.
-         * <p/>
+         * <p>
          * This event is followed by a series of {@link MapView.MapChange#RegionIsChanging} and ends
          * with {@link MapView.MapChange#RegionDidChangeAnimated}.
          */
@@ -685,6 +690,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         mGpsMarker.setImageResource(R.drawable.location_marker);
         mGpsMarker.setScaleType(ImageView.ScaleType.MATRIX);
         mGpsMarker.setVisibility(View.INVISIBLE);
+        mGpsRotationMatrix = new Matrix();
         mGpsMarkerOffset = (int) iconSize / 2;
         addView(mGpsMarker);
 
@@ -1002,9 +1008,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Centers the map on a new coordinate immediately without changing the zoom level.
-     * <p/>
+     * <p>
      * The initial coordinate is (0, 0).
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLng, boolean)}.
      *
      * @param centerCoordinate The new coordinate.
@@ -1017,7 +1023,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Centers the map on a new coordinate without changing the zoom level and optionally animates the change.
-     * <p/>
+     * <p>
      * The initial coordinate is (0, 0).
      *
      * @param centerCoordinate The new coordinate.
@@ -1036,9 +1042,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Centers the map on a new coordinate immediately while changing the current zoom level.
-     * <p/>
+     * <p>
      * The initial value is a center coordinate of (0, 0) and a zoom level of 0.
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLngZoom, boolean)}.
      *
      * @param centerCoordinate The new coordinate and zoom level.
@@ -1061,7 +1067,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Centers the map on a new coordinate while changing the zoom level and optionally animates the change.
-     * <p/>
+     * <p>
      * The initial value is a center coordinate of (0, 0) and a zoom level of 0.
      *
      * @param centerCoordinate The new coordinate and zoom level.
@@ -1090,10 +1096,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Changes whether the user may scroll around the map.
-     * <p/>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * <p>
      * The default value is true.
      *
      * @param scrollEnabled If true, scrolling is enabled.
@@ -1129,14 +1135,14 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Rotates the map to a new heading relative to true north immediately.
-     * <p/>
+     * <p>
      * The value 0 means that the top edge of the map view will correspond to true north.<br>
      * The value 90 means the top of the map will point due east.<br>
      * The value 180 means the top of the map will point due south.<br>
      * The value 270 means the top of the map will point due west.
-     * <p/>
+     * <p>
      * The initial heading is 0.
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#setDirection(double, boolean)}.
      *
      * @param direction The new heading measured in degrees.
@@ -1149,12 +1155,12 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Rotates the map to a new heading relative to true north and optionally animates the change.
-     * <p/>
+     * <p>
      * The value 0 means that the top edge of the map view will correspond to true north.<br/>
      * The value 90 means the top of the map will point due east.<br/>
      * The value 180 means the top of the map will point due south.<br/>
      * The value 270 means the top of the map will point due west
-     * <p/>
+     * <p>
      * The initial heading is 0.
      *
      * @param direction The new heading measured in degrees from true north.
@@ -1189,10 +1195,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Changes whether the user may rotate the map.
-     * <p/>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * <p>
      * The default value is true.
      *
      * @param rotateEnabled If true, rotating is enabled.
@@ -1219,13 +1225,13 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Zooms the map to a new zoom level immediately without changing the center coordinate.
-     * <p/>
+     * <p>
      * At zoom level 0, tiles cover the entire world map;
      * at zoom level 1, tiles cover &frac14 of the world;
      * at zoom level 2, tiles cover 1/16 of the world, and so on.
-     * <p/>
+     * <p>
      * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM_LEVEL}.
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#setZoomLevel(double, boolean)}.
      *
      * @param zoomLevel The new coordinate.
@@ -1239,11 +1245,11 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Zooms the map to a new zoom level and optionally animates the change without changing the center coordinate.
-     * <p/>
+     * <p>
      * At zoom level 0, tiles cover the entire world map;
      * at zoom level 1, tiles cover &frac14 of the world;
      * at zoom level 2, tiles cover 1/16 of the world, and so on.
-     * <p/>
+     * <p>
      * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM_LEVEL}.
      *
      * @param zoomLevel The new coordinate.
@@ -1272,10 +1278,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Changes whether the user may zoom the map.
-     * <p/>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * <p>
      * The default value is true.
      *
      * @param zoomEnabled If true, zooming is enabled.
@@ -1321,7 +1327,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Changes whether the map debug information is shown.
-     * <p/>
+     * <p>
      * The default value is false.
      *
      * @param debugActive If true, map debug information is shown.
@@ -1334,7 +1340,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Toggles whether the map debug information is shown.
-     * <p/>
+     * <p>
      * The value of {@link MapView#isDebugActive()} is toggled.
      *
      * @see MapView#isDebugActive()
@@ -1356,7 +1362,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Loads a new map style from the specified URL.
-     * <p/>
+     * <p>
      * {@code url} can take the following forms:
      * <ul>
      * <li>{@code MapView.StyleUrls.*}: load one of the bundled styles in {@link MapView.StyleUrls}.</li>
@@ -1371,10 +1377,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * This is used to load a style bundled with your app.</li>
      * <li>{@code null}: loads the default {@link MapView.StyleUrls#MAPBOX_STREETS} style.</li>
      * </ul>
-     * <p/>
+     * <p>
      * This method is asynchronous and will return immediately before the style finishes loading.
      * If you wish to wait for the map to finish loading listen for the {@link MapView.MapChange#DidFinishLoadingMap} event.
-     * <p/>
+     * <p>
      * If the style fails to load or an invalid style URL is set, the map view will become blank.
      * An error message will be logged in the Android logcat and {@link MapView.MapChange#DidFailLoadingMap} event will be sent.
      *
@@ -1392,7 +1398,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Returns the map style currently displayed in the map view.
-     * <p/>
+     * <p>
      * If the default style is currently displayed, a URL will be returned instead of null.
      *
      * @return The URL of the map style.
@@ -1416,9 +1422,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Changes the set of currently active map style classes immediately.
-     * <p/>
+     * <p>
      * The list of valid class identifiers is defined by the currently loaded map style.
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
      *
      * @param styleClasses A list of class identifiers.
@@ -1432,7 +1438,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Changes the set of currently active map style classes with an animated transition.
-     * <p/>
+     * <p>
      * The list of valid class identifiers is defined by the currently loaded map style.
      *
      * @param styleClasses       A list of class identifiers.
@@ -1455,7 +1461,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Activates the specified map style class.
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
      *
      * @param styleClass The class identifier.
@@ -1471,7 +1477,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Deactivates the specified map style class.
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
      *
      * @param styleClass The class identifier.
@@ -1501,7 +1507,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Deactivates all the currently active map style classes immediately.
-     * <p/>
+     * <p>
      * If you want to animate the change, use {@link MapView#removeAllStyleClasses(long)}.
      *
      * @see MapView#removeAllStyleClasses(long)
@@ -1539,7 +1545,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Sets the current Mapbox access token used to load map styles and tiles.
-     * <p/>
+     * <p>
      * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
      * or an exception will be thrown.
      *
@@ -1768,7 +1774,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Returns the distance spanned by one pixel at the specified latitude and current zoom level.
-     * <p/>
+     * <p>
      * The distance between pixels decreases as the latitude approaches the poles. This relationship parallels the relationship between longitudinal coordinates at different latitudes.
      *
      * @param latitude The latitude for which to return the value.
@@ -2639,7 +2645,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Add a callback that's invoked when the displayed map view changes.
-     * <p/>
+     * <p>
      * To remove the callback, use {@link MapView#removeOnMapChangedListener(OnMapChangedListener)}.
      *
      * @param listener The callback that's invoked on every frame rendered to the map view.
@@ -2684,7 +2690,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     /**
      * Sets a custom renderer for the contents of {@link InfoWindow}.
-     * <p/>
+     * <p>
      * When set your callback is invoked when an {@code InfoWindow} is about to be shown. By returning
      * a custom {@link View}, the default {@code InfoWindow} will be replaced.
      *
@@ -2877,12 +2883,10 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             if (mUserLocationTrackingMode != TRACKING_NONE) {
                 // fixme needs to be called with true, conflicts with gestures
                 setCenterCoordinate(location, false);
-                if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS && mCompassView.isValid()) {
-                    // fixme needs to be called with true, conflicts with unknown reason
-                    setDirection(-mCompassView.getBearing(), false);
+                if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
+                    // updateGpsMarkerBearing(mCompassView.getBearing());
                 } else if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS && mGpsLocation.hasBearing()) {
-                    // fixme needs to be called with true, conflicts with unknown reason
-                    setDirection(-mGpsLocation.getBearing(), false);
+                    updateGpsMarkerBearing(mGpsLocation.getBearing());
                 }
             }
         } else {
@@ -2890,6 +2894,21 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 mGpsMarker.setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    private ViewPropertyAnimator mGpsRotateAnimator;
+
+    private void updateGpsMarkerBearing(float bearing) {
+
+        if (!mDirty) {
+            mGpsRotateAnimator = mGpsMarker.animate().rotationBy(bearing);
+        } else {
+
+        }
+        mGpsRotationMatrix = new Matrix();
+        mGpsRotationMatrix.postRotate(bearing, mGpsMarkerOffset, mGpsMarkerOffset);
+        mGpsMarker.setImageMatrix(mGpsRotationMatrix);
+        //setDirection(-bearing, true);
     }
 
     @UserLocationTrackingMode
@@ -2903,7 +2922,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mGpsMarker.setImageResource(R.drawable.location_marker);
         } else {
             // tracking user
-            if(userLocationTrackingMode != TRACKING_FOLLOW){
+            if (userLocationTrackingMode != TRACKING_FOLLOW) {
                 mRotateEnabled = false;
             }
 
@@ -2939,7 +2958,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
      * rotated away from its default orientation (tilt of 0 and a bearing of 0). When a user clicks
      * the compass, the camera orients itself to its default orientation and fades away shortly
      * after. If disabled, the compass will never be displayed.
-     * <p/>
+     * <p>
      * By default, the compass is enabled
      *
      * @param compassEnabled true to enable the compass; false to disable the compass.
@@ -2966,6 +2985,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         imageView.setScaleType(ImageView.ScaleType.MATRIX);
     }
 
+
     // Updates the UI to match the current map's position
     private void updateCompass() {
         if (isCompassEnabled()) {
@@ -2979,6 +2999,94 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     @Override
     public Location getLocation() {
         return mGpsLocation;
+    }
+
+    private boolean mRunning;
+
+    @Override
+    public void setBearing(float bearing) {
+        Log.v("TAG", "SETTING BEARING" + bearing+ "            " +normalizeAngle(bearing));
+
+        if (mGpsRotateAnimator == null) {
+            mGpsRotateAnimator = mGpsMarker.animate();
+            mGpsRotateAnimator.setListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    mRunning = true;
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mRunning = false;
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+        }
+
+
+        if (!mDirty) {
+//            mGpsMarker.setRotation(bearing);
+            mGpsMarker.setImageResource(R.drawable.location_marker);
+            mGpsRotateAnimator = mGpsMarker.animate().rotation(bearing);
+            mNativeMapView.setBearing(bearing);
+        } else {
+            if (mRunning) {
+                mGpsRotateAnimator.cancel();
+            }
+            mNativeMapView.cancelTransitions();
+            mNativeMapView.setBearing(bearing);
+//            mGpsRotationMatrix = new Matrix();
+//            mGpsRotationMatrix.postRotate(bearing, mGpsMarkerOffset, mGpsMarkerOffset);
+//            mGpsMarker.setImageMatrix(mGpsRotationMatrix);
+        }
+    }
+
+    private float normalizeAngle(float degrees){
+        if(degrees >= -22.5 && degrees < 22.5) { return 0; }
+        if(degrees >= 22.5 && degrees < 67.5) { return 45; }
+        if(degrees >= 67.5 && degrees < 112.5) { return 90; }
+        if(degrees >= 112.5 && degrees < 157.5) { return 135; }
+        if(degrees >= 157.5 || degrees < -157.5) { return 180; }
+        if(degrees >= -157.5 && degrees < -112.5) { return 225; }
+        if(degrees >= -112.5 && degrees < -67.5) { return 270; }
+        if(degrees >= -67.5 && degrees < -22.5) { return 315; }
+        return 360;
+    }
+
+
+    public class AngleLowpassFilter {
+
+        private final int LENGTH = 2;
+
+        private float sumSin, sumCos;
+
+        private ArrayDeque<Float> queue = new ArrayDeque<>();
+
+        public void add(float radians) {
+            sumSin += (float) Math.sin(radians);
+            sumCos += (float) Math.cos(radians);
+            queue.add(radians);
+
+            if (queue.size() > LENGTH) {
+                float old = queue.poll();
+                sumSin -= Math.sin(old);
+                sumCos -= Math.cos(old);
+            }
+        }
+
+        public float average() {
+            int size = queue.size();
+            return (float) Math.atan2(sumSin / size, sumCos / size);
+        }
     }
 
     //
