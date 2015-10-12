@@ -295,20 +295,24 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), SecondMapActivity.class));
                                 return true;
 
-                            case R.id.followNone:
-                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_NONE);
-                                return true;
+//                            case R.id.followNone:
+//                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_NONE);
+//                                return true;
+//
+//                            case R.id.followFollow:
+//                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW);
+//                                return true;
+//
+//                            case R.id.followBearingGps:
+//                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING_GPS);
+//                                return true;
+//
+//                            case R.id.followBearingCompass:
+//                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING_COMPASS);
+//                                return true;
 
-                            case R.id.followFollow:
-                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW);
-                                return true;
-
-                            case R.id.followBearingGps:
-                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING_GPS);
-                                return true;
-
-                            case R.id.followBearingCompass:
-                                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING_COMPASS);
+                            case R.id.action_user_tracking_activity:
+                                startActivity(new Intent(getApplicationContext(), UserTrackingActivity.class));
                                 return true;
 
                             default:

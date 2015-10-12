@@ -25,18 +25,10 @@
           android:checkable="false"
         />
 
-    <group android:id="@+id/locationFollowModesSeparator"/>
-
-    <group android:id="@+id/locationFollowModes" android:checkableBehavior="single">
-        <item android:id="@+id/followNone"
-              android:title="@string/action_location_none"/>
-        <item android:id="@+id/followFollow"
-                  android:title="@string/action_location_follow"/>
-        <item android:id="@+id/followBearingGps"
-              android:title="@string/action_location_bearing_GPS"/>
-        <item android:id="@+id/followBearingCompass"
-            android:title="@string/action_location_bearing_compass"/>
-    </group>
+    <item android:id="@+id/action_user_tracking_activity"
+        android:icon="@drawable/ic_looks_two_white_24dp"
+        android:title="@string/activity_user_tracking"
+        android:checkable="false"/>
 
     <group android:id="@+id/stylesSeparator"/>
 

@@ -10,48 +10,45 @@ import android.location.Location;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayDeque;
+import java.util.Calendar;
 import java.util.Date;
 
 final class CompassView extends ImageView implements SensorEventListener {
 
+    private static final String TAG = "CompassView";
     private CompassDelegate mCompassDelegate;
 
     // Sensor model
     private SensorManager mSensorManager;
     private Sensor mSensorRotationVector;
-    private Sensor mSensorAccelerometer;
-    private Sensor mSensorMagneticField;
 
     // Sensor data sensor rotation vector
-    private float[] mRotationMatrix = new float[9];
+    private float[] mRotationMatrix = new float[16];
+    private float[] mRemappedMatrix = new float[16];
     private float[] mOrientation = new float[3];
-
-    // Sensor data accelero + magnetic
-//    private boolean mSensorValid;
-//    private float[] mValuesAccelerometer = new float[3];
-//    private float[] mValuesMagneticField = new float[3];
-//    private float[] mMatrixR = new float[9];
-//    private float[] mMatrixI = new float[9];
-//    private float[] mMatrixValues = new float[3];
 
     // Location data
     private GeomagneticField mGeomagneticField;
     private Location mGpsLocation;
 
     // Controls the sensor update rate in milliseconds
-    private static final int UPDATE_RATE_MS = 250;
+    private static final int UPDATE_RATE_MS = 500;
 
     // Compass data
     private float mCompassBearing;
-    private boolean mCompassValid;
     private long mCompassUpdateNextTimestamp = 0;
+    private AngleLowpassFilter mLowpassFilter;
 
     public CompassView(Context context) {
         super(context);
@@ -72,8 +69,6 @@ final class CompassView extends ImageView implements SensorEventListener {
         // Sensor initialisation
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mSensorRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-//        mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-//        mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         // View configuration
         setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
@@ -83,6 +78,9 @@ final class CompassView extends ImageView implements SensorEventListener {
         float mScreenDensity = context.getResources().getDisplayMetrics().density;
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) (48 * mScreenDensity), (int) (48 * mScreenDensity));
         setLayoutParams(lp);
+
+        // Low pass filter
+        mLowpassFilter = new AngleLowpassFilter();
     }
 
     @Override
@@ -91,90 +89,57 @@ final class CompassView extends ImageView implements SensorEventListener {
         setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
     }
 
-    public boolean isValid() {
-        return mCompassValid;
-    }
-
-    public float getBearing() {
-        return mCompassBearing;
-    }
-
     public void registerListeners(CompassDelegate compassDelegate) {
-        // Rate limit to UPDATE_RATE_US, events can still be delivered faster
-//        mSensorManager.registerListener(this, mSensorAccelerometer, UPDATE_RATE_MS * 1000);
-//        mSensorManager.registerListener(this, mSensorMagneticField, UPDATE_RATE_MS * 1000);
-        mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 1000);
         mCompassDelegate = compassDelegate;
+        mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 1000);
     }
 
     public void unRegisterListeners() {
         mCompassDelegate = null;
         mSensorManager.unregisterListener(this, mSensorRotationVector);
-//        mSensorManager.unregisterListener(this, mSensorMagneticField);
-//        mSensorManager.unregisterListener(this, mSensorAccelerometer);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        long currentTime = System.currentTimeMillis();
-//        if (currentTime < mCompassUpdateNextTimestamp) {
-//            return;
-//        }
         if (mCompassDelegate != null) {
-
             switch (event.sensor.getType()) {
                 case Sensor.TYPE_ROTATION_VECTOR:
                     SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
-                    SensorManager.remapCoordinateSystem(mRotationMatrix,
-                            SensorManager.AXIS_X, SensorManager.AXIS_Y,
-                            mRotationMatrix);
-                    SensorManager.getOrientation(mRotationMatrix, mOrientation);
                     break;
             }
-//
-//            case Sensor.TYPE_ACCELEROMETER:
-//                System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
-//                break;
-//
-//            case Sensor.TYPE_MAGNETIC_FIELD:
-//                System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
-//                break;
-//        }
-//
-//        if (currentTime < mCompassUpdateNextTimestamp) {
-//            return;
-//        }
-////
-//        mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
-//
-//        mSensorValid = SensorManager.getRotationMatrix(mMatrixR, mMatrixI,
-//                mValuesAccelerometer,
-//                mValuesMagneticField);
-//
-//        if (mSensorValid && mCompassDelegate != null) {
-//            SensorManager.getOrientation(mMatrixR, mMatrixValues);
 
-            mGpsLocation = mCompassDelegate.getLocation();
-            if (mGpsLocation != null) {
-                mGeomagneticField = new GeomagneticField(
-                        (float) mGpsLocation.getLatitude(),
-                        (float) mGpsLocation.getLongitude(),
-                        (float) mGpsLocation.getAltitude(),
-                        new Date().getTime());
-//                mCompassBearing = (float) Math.toDegrees(mMatrixValues[0]) + mGeomagneticField.getDeclination();
-//                mCompassValid = true;
-//                mCompassDelegate.setBearing(mCompassBearing);
-                android.text.format.DateFormat df = new android.text.format.DateFormat();
-                ;
-                Log.v("TAG","TIME" + df.format("yyyy-MM-dd kk:mm:ss", new java.util.Date()));
-                Log.v("TAG","Orientation " + mOrientation[0]);
-                mCompassDelegate.setBearing((float) Math.toDegrees(mOrientation[0]));
+//            Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+//            int rot = display.getRotation();
+//            switch (rot) {
+//                case Surface.ROTATION_0:
+                    // Portrait
+                    SensorManager.getOrientation(mRotationMatrix, mOrientation);
+//                    break;
+//                default:
+//                    // Landscape
+//                    SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_MINUS_X, mRemappedMatrix);
+//                    SensorManager.getOrientation(mRemappedMatrix, mOrientation);
+//                    break;
+//            }
 
+            mLowpassFilter.add(mOrientation[0]);
+
+            long currentTime = System.currentTimeMillis();
+            if (currentTime < mCompassUpdateNextTimestamp) {
+                return;
             }
-//        }
+            mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
+            mGpsLocation = mCompassDelegate.getLocation();
+            mGeomagneticField = new GeomagneticField(
+                    (float) mGpsLocation.getLatitude(),
+                    (float) mGpsLocation.getLongitude(),
+                    (float) mGpsLocation.getAltitude(),
+                    currentTime);
+            mCompassBearing = (float) Math.toDegrees(mLowpassFilter.average()) + mGeomagneticField.getDeclination();
+//            mCompassBearing = (mCompassBearing % 360.0f + 360.0f) % 360.0f;
+            mCompassDelegate.onCompassValueChanged(mCompassBearing);
         }
     }
-//
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -185,7 +150,7 @@ final class CompassView extends ImageView implements SensorEventListener {
 
         Location getLocation();
 
-        void setBearing(float bearing);
+        void onCompassValueChanged(float bearing);
 
     }
 
@@ -203,6 +168,32 @@ final class CompassView extends ImageView implements SensorEventListener {
             if (mapView != null) {
                 mapView.resetNorth();
             }
+        }
+    }
+
+    public class AngleLowpassFilter {
+
+        private final int LENGTH = 3;
+
+        private float sumSin, sumCos;
+
+        private ArrayDeque<Float> queue = new ArrayDeque<>();
+
+        public void add(float radians) {
+            sumSin += (float) Math.sin(radians);
+            sumCos += (float) Math.cos(radians);
+            queue.add(radians);
+
+            if (queue.size() > LENGTH) {
+                float old = queue.poll();
+                sumSin -= Math.sin(old);
+                sumCos -= Math.cos(old);
+            }
+        }
+
+        public float average() {
+            int size = queue.size();
+            return (float) Math.atan2(sumSin / size, sumCos / size);
         }
     }
 }

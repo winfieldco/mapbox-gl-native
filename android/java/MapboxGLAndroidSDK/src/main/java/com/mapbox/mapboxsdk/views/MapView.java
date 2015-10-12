@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.views;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
@@ -37,7 +35,6 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -76,7 +73,6 @@ import com.mapzen.android.lost.api.LostApiClient;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -199,8 +195,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     private LostApiClient mLocationClient;
     private LocationRequest mLocationRequest;
     private ImageView mGpsMarker;
-    private int mGpsMarkerOffset;
     private Matrix mGpsRotationMatrix;
+    private int mGpsMarkerOffset;
+    private ViewPropertyAnimator mGpsRotateAnimator;
     private Location mGpsLocation;
     private int mUserLocationTrackingMode;
     private ViewPropertyAnimator mGpsMarkerAnimatorX;
@@ -238,6 +235,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
 
     // Used to manage FPS change event listeners
     private OnFpsChangedListener mOnFpsChangedListener;
+
+    // Used to manage Location change event listeners
+    private OnLocationChangedListener mOnLocationChangedListener;
 
     //
     // Properties
@@ -453,6 +453,20 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
          * @param fps The average number of frames rendered over the last second.
          */
         void onFpsChanged(double fps);
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when the user location has changed
+     *
+     * @see MapView#setOnLocationChangedListener(OnLocationChangedListener)
+     */
+    public interface OnLocationChangedListener {
+        /**
+         * Called for every location change event
+         *
+         * @param location The changed location
+         */
+        void onLocationChanged(Location location);
     }
 
     /**
@@ -1854,7 +1868,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             @Override
             public void run() {
                 updateCompass();
-                updateGpsMarker();
+                updateGpsMarkerLocation();
                 mNativeMapView.renderSync();
                 mDirty = false;
             }
@@ -2712,6 +2726,17 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         mOnFpsChangedListener = listener;
     }
 
+    /**
+     * Sets a callback that's invoked when user location has changed.
+     *
+     * @param listener The callback that's invoked when user location has changed.
+     *                 To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnLocationChangedListener(@Nullable OnLocationChangedListener listener){
+        mOnLocationChangedListener = listener;
+    }
+
     // Called when debug mode is enabled to update a FPS counter
     // Called via JNI from NativeMapView
     // Forward to any listener
@@ -2828,7 +2853,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 mLocationClient.connect();
                 updateLocation(LocationServices.FusedLocationApi.getLastLocation());
                 LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
-                mCompassView.registerListeners(this);
             }
         } else {
             if (mLocationClient.isConnected()) {
@@ -2844,31 +2868,36 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     // LOST's LocationListener callback
     @Override
     public void onLocationChanged(Location location) {
-        updateLocation(location);
+        if (mOnLocationChangedListener != null) {
+            mOnLocationChangedListener.onLocationChanged(location);
+        }else{
+            updateLocation(location);
+        }
     }
 
     // Handles location updates from GPS
     private void updateLocation(Location location) {
-        if (location != null && !mDirty) {
+        if (location != null) {
             mGpsLocation = location;
-            updateGpsMarker();
+            updateGpsMarkerLocation();
+            updateGpsMarkerBearing(location.getBearing());
         }
     }
 
-    private void updateGpsMarker() {
+    private void updateGpsMarkerLocation() {
         if (mIsMyLocationEnabled && mGpsLocation != null) {
             mGpsMarker.setVisibility(View.VISIBLE);
-            LatLng location = new LatLng(mGpsLocation.getLatitude(), mGpsLocation.getLongitude());
+            LatLng position = new LatLng(mGpsLocation.getLatitude(), mGpsLocation.getLongitude());
 
-            // Update marker if not tracking user
             if (mUserLocationTrackingMode == TRACKING_NONE) {
-                PointF screenLocation = toScreenLocation(location);
+                // NOT TRACKING USER: animate GPS marker if possible
+                PointF screenLocation = toScreenLocation(position);
                 if (!mDirty) {
                     // Map is idle, animate change of location
                     mGpsMarkerAnimatorX = mGpsMarker.animate().x(screenLocation.x - mGpsMarkerOffset);
                     mGpsMarkerAnimatorY = mGpsMarker.animate().y(screenLocation.y - mGpsMarkerOffset);
                 } else {
-                    // Map is undergoing changes, can't animate
+                    // Map is not idle, set value, don't animate
                     if (mGpsMarkerAnimatorX != null) {
                         mGpsMarkerAnimatorX.cancel();
                         mGpsMarkerAnimatorY.cancel();
@@ -2877,38 +2906,43 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                     mGpsMarker.setX(screenLocation.x - mGpsMarkerOffset);
                     mGpsMarker.setY(screenLocation.y - mGpsMarkerOffset);
                 }
-            }
-
-            // Rotate marker
-            if (mUserLocationTrackingMode != TRACKING_NONE) {
+            } else {
+                // TRACKING USER: move map to user position
                 // fixme needs to be called with true, conflicts with gestures
-                setCenterCoordinate(location, false);
-                if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
-                    // updateGpsMarkerBearing(mCompassView.getBearing());
-                } else if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS && mGpsLocation.hasBearing()) {
-                    updateGpsMarkerBearing(mGpsLocation.getBearing());
-                }
+                setCenterCoordinate(position, false);
             }
         } else {
-            if (mGpsMarker != null) {
-                mGpsMarker.setVisibility(View.INVISIBLE);
+            mGpsMarker.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void updateGpsMarkerBearing(float bearing){
+        // Handle bearing depending on tracking mode
+        if (mUserLocationTrackingMode == TRACKING_FOLLOW || mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
+            // Use bearing from compass
+            // TODO animate rotation -> mGpsMarker.animate().rotation(bearing)
+            rotateGpsMarker(bearing);
+            if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
+                setDirection(-bearing);
+            }
+        } else {
+            // Use bearing from GPS
+            if (mGpsLocation.hasBearing()) {
+                mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
+                // TODO animate rotation -> mGpsMarker.animate().rotation(bearing) + fixme bearing from gps has 90 degrees offset
+                rotateGpsMarker(bearing);
+                setDirection(-bearing);
+            }else{
+                mGpsMarker.setImageResource(R.drawable.location_marker);
             }
         }
     }
 
-    private ViewPropertyAnimator mGpsRotateAnimator;
-
-    private void updateGpsMarkerBearing(float bearing) {
-
-        if (!mDirty) {
-            mGpsRotateAnimator = mGpsMarker.animate().rotationBy(bearing);
-        } else {
-
-        }
+    private void rotateGpsMarker(float bearing) {
         mGpsRotationMatrix = new Matrix();
         mGpsRotationMatrix.postRotate(bearing, mGpsMarkerOffset, mGpsMarkerOffset);
         mGpsMarker.setImageMatrix(mGpsRotationMatrix);
-        //setDirection(-bearing, true);
+        setDirection(-bearing, true);
     }
 
     @UserLocationTrackingMode
@@ -2917,26 +2951,28 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     public void setUserLocationTrackingMode(@UserLocationTrackingMode int userLocationTrackingMode) {
+        mUserLocationTrackingMode = userLocationTrackingMode;
+
         if (userLocationTrackingMode == TRACKING_NONE) {
+            // restore gestures
             mScrollEnabled = true;
+            mRotateEnabled = true;
             mGpsMarker.setImageResource(R.drawable.location_marker);
         } else {
             // tracking user
-            if (userLocationTrackingMode != TRACKING_FOLLOW) {
-                mRotateEnabled = false;
-            }
-
-            mScrollEnabled = false;
-            if (userLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS || userLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS) {
-                mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
-            } else {
-                mGpsMarker.setImageResource(R.drawable.location_marker);
-            }
+            mRotateEnabled = userLocationTrackingMode == TRACKING_FOLLOW;
+            mScrollEnabled = userLocationTrackingMode == TRACKING_FOLLOW;
             mGpsMarker.setX(getWidth() / 2 - mGpsMarkerOffset);
             mGpsMarker.setY(getHeight() / 2 - mGpsMarkerOffset);
+            mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
         }
-        mUserLocationTrackingMode = userLocationTrackingMode;
-        updateGpsMarker();
+
+        if(userLocationTrackingMode == TRACKING_FOLLOW || userLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
+            mCompassView.registerListeners(this);
+        }else{
+            mCompassView.unRegisterListeners();
+        }
+        onInvalidate();
     }
 
     //
@@ -3001,92 +3037,9 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         return mGpsLocation;
     }
 
-    private boolean mRunning;
-
     @Override
-    public void setBearing(float bearing) {
-        Log.v("TAG", "SETTING BEARING" + bearing+ "            " +normalizeAngle(bearing));
-
-        if (mGpsRotateAnimator == null) {
-            mGpsRotateAnimator = mGpsMarker.animate();
-            mGpsRotateAnimator.setListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    mRunning = true;
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mRunning = false;
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-            });
-        }
-
-
-        if (!mDirty) {
-//            mGpsMarker.setRotation(bearing);
-            mGpsMarker.setImageResource(R.drawable.location_marker);
-            mGpsRotateAnimator = mGpsMarker.animate().rotation(bearing);
-            mNativeMapView.setBearing(bearing);
-        } else {
-            if (mRunning) {
-                mGpsRotateAnimator.cancel();
-            }
-            mNativeMapView.cancelTransitions();
-            mNativeMapView.setBearing(bearing);
-//            mGpsRotationMatrix = new Matrix();
-//            mGpsRotationMatrix.postRotate(bearing, mGpsMarkerOffset, mGpsMarkerOffset);
-//            mGpsMarker.setImageMatrix(mGpsRotationMatrix);
-        }
-    }
-
-    private float normalizeAngle(float degrees){
-        if(degrees >= -22.5 && degrees < 22.5) { return 0; }
-        if(degrees >= 22.5 && degrees < 67.5) { return 45; }
-        if(degrees >= 67.5 && degrees < 112.5) { return 90; }
-        if(degrees >= 112.5 && degrees < 157.5) { return 135; }
-        if(degrees >= 157.5 || degrees < -157.5) { return 180; }
-        if(degrees >= -157.5 && degrees < -112.5) { return 225; }
-        if(degrees >= -112.5 && degrees < -67.5) { return 270; }
-        if(degrees >= -67.5 && degrees < -22.5) { return 315; }
-        return 360;
-    }
-
-
-    public class AngleLowpassFilter {
-
-        private final int LENGTH = 2;
-
-        private float sumSin, sumCos;
-
-        private ArrayDeque<Float> queue = new ArrayDeque<>();
-
-        public void add(float radians) {
-            sumSin += (float) Math.sin(radians);
-            sumCos += (float) Math.cos(radians);
-            queue.add(radians);
-
-            if (queue.size() > LENGTH) {
-                float old = queue.poll();
-                sumSin -= Math.sin(old);
-                sumCos -= Math.cos(old);
-            }
-        }
-
-        public float average() {
-            int size = queue.size();
-            return (float) Math.atan2(sumSin / size, sumCos / size);
-        }
+    public void onCompassValueChanged(float bearing) {
+        updateGpsMarkerBearing(bearing);
     }
 
     //

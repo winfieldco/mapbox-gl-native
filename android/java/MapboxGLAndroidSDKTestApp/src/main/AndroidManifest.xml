@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.mapbox.mapboxsdk.testapp.SecondMapActivity" android:label="@string/activity_second"/>
+        <activity android:name=".UserTrackingActivity" android:label="@string/activity_user_tracking"/>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9724157045ff7d083492c6d9ae03e60e8609d461" />
