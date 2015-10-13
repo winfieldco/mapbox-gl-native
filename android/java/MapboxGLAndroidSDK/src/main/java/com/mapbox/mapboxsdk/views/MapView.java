@@ -35,6 +35,7 @@ import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -403,7 +404,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
         }
     }
 
-    @IntDef({TRACKING_NONE, TRACKING_FOLLOW, TRACKING_FOLLOW_BEARING_GPS, TRACKING_FOLLOW_BEARING_COMPASS})
+    @IntDef({TRACKING_NONE, TRACKING_FOLLOW, TRACKING_FOLLOW_BEARING_GPS, TRACKING_FOLLOW_BEARING_COMPASS, TRACKING_FOLLOW_BEARING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface UserLocationTrackingMode {
     }
@@ -412,6 +413,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     public static final int TRACKING_FOLLOW = 0x00000004;
     public static final int TRACKING_FOLLOW_BEARING_GPS = 0x00000008;
     public static final int TRACKING_FOLLOW_BEARING_COMPASS = 0x00000012;
+    public static final int TRACKING_FOLLOW_BEARING = 0x00000016;
 
     //
     // Interfaces
@@ -2250,7 +2252,14 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mNativeMapView.cancelTransitions();
 
             // Scale the map
-            mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+
+            if (mUserLocationTrackingMode == TRACKING_NONE) {
+                // Scale around center of the gesture
+                mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+            } else {
+                // Scale around the center of the map
+                mNativeMapView.scaleBy(detector.getScaleFactor(), mGpsMarker.getX() - mGpsMarkerOffset, mGpsMarker.getY() - mGpsMarkerOffset);
+            }
 
             return true;
         }
@@ -2325,6 +2334,7 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
                 // Rotate around the center of the map
+                rotateGpsMarker((float) bearing);
                 mNativeMapView.setBearing(bearing, mGpsMarker.getX() - mGpsMarkerOffset, mGpsMarker.getY() - mGpsMarkerOffset);
             }
             return true;
@@ -2908,7 +2918,6 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
                 }
             } else {
                 // TRACKING USER: move map to user position
-                // fixme needs to be called with true, conflicts with gestures
                 setCenterCoordinate(position, false);
             }
         } else {
@@ -2917,18 +2926,28 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
     }
 
     private void updateGpsMarkerBearing(float bearing){
-        // Handle bearing depending on tracking mode
-        if (mUserLocationTrackingMode == TRACKING_FOLLOW || mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
+        if(mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING){
+            // Use a combined bearing
+            if(mGpsLocation.hasBearing()){
+                mGpsMarker.setImageResource(R.drawable.location_marker_bearing_gps);
+                rotateGpsMarker(mGpsLocation.getBearing());
+                setDirection(-mGpsLocation.getBearing());
+            }else{
+                mGpsMarker.setImageResource(R.drawable.location_marker_bearing_compass);
+                rotateGpsMarker(bearing);
+                setDirection(-bearing);
+            }
+        }else if (mUserLocationTrackingMode == TRACKING_FOLLOW || mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
             // Use bearing from compass
             // TODO animate rotation -> mGpsMarker.animate().rotation(bearing)
             rotateGpsMarker(bearing);
             if (mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
                 setDirection(-bearing);
             }
-        } else {
+        } else if(mUserLocationTrackingMode == TRACKING_FOLLOW_BEARING_GPS){
             // Use bearing from GPS
             if (mGpsLocation.hasBearing()) {
-                mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
+                mGpsMarker.setImageResource(R.drawable.location_marker_bearing_gps);
                 // TODO animate rotation -> mGpsMarker.animate().rotation(bearing) + fixme bearing from gps has 90 degrees offset
                 rotateGpsMarker(bearing);
                 setDirection(-bearing);
@@ -2964,10 +2983,15 @@ public final class MapView extends FrameLayout implements LocationListener, Comp
             mScrollEnabled = userLocationTrackingMode == TRACKING_FOLLOW;
             mGpsMarker.setX(getWidth() / 2 - mGpsMarkerOffset);
             mGpsMarker.setY(getHeight() / 2 - mGpsMarkerOffset);
-            mGpsMarker.setImageResource(R.drawable.location_marker_bearing);
+            if(userLocationTrackingMode==TRACKING_FOLLOW_BEARING_GPS){
+                // always start with non bearing image, bearing updates when location changes
+                mGpsMarker.setImageResource(R.drawable.location_marker);
+            }else{
+                mGpsMarker.setImageResource(R.drawable.location_marker_bearing_compass);
+            }
         }
 
-        if(userLocationTrackingMode == TRACKING_FOLLOW || userLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS) {
+        if(userLocationTrackingMode == TRACKING_FOLLOW || userLocationTrackingMode == TRACKING_FOLLOW_BEARING_COMPASS || userLocationTrackingMode == TRACKING_FOLLOW_BEARING) {
             mCompassView.registerListeners(this);
         }else{
             mCompassView.unRegisterListeners();

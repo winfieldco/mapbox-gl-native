@@ -100,6 +100,11 @@ public class UserTrackingActivity extends AppCompatActivity implements MapView.O
             case 3:
                 mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING_COMPASS);
                 break;
+
+            case 4:
+                mMapView.setUserLocationTrackingMode(MapView.TRACKING_FOLLOW_BEARING);
+                break;
+
         }
     }
 

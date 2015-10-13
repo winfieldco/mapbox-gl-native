@@ -32,6 +32,7 @@
         <item>Follow tracking mode</item>
         <item>Bearing tracking GPS mode</item>
         <item>Bearing tracking Compass mode</item>
+        <item>Bearing tracking mode</item>
     </string-array>
 
 </resources>
