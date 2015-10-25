@@ -385,6 +385,10 @@ final class NativeMapView {
         nativeSetSprite(mNativeMapViewPtr, symbol, width, height, scale, pixels);
     }
 
+    public void removeSprite(String symbol) {
+        nativeRemoveSprite(mNativeMapViewPtr, symbol);
+    }
+
     public void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
         nativeSetVisibleCoordinateBounds(mNativeMapViewPtr, coordinates, padding, direction, duration);
     }
@@ -596,6 +600,8 @@ final class NativeMapView {
 
     private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
                                         int width, int height, float scale, byte[] pixels);
+
+    private native void nativeRemoveSprite(long nativeMapViewPtr, String symbol);
 
     private native void nativeSetVisibleCoordinateBounds(long mNativeMapViewPtr, LatLng[] coordinates,
                                                          RectF padding, double direction, long duration);

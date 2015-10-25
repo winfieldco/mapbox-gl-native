@@ -21,7 +21,7 @@ import java.io.InputStream;
 
 public final class SpriteFactory {
 
-    private static final String SPRITE_ID_PREFIX = "com.mapbox.sprites.sprite_";
+    private static final String SPRITE_ID_FORMAT = "com.mapbox.sprites.sprite_%d";
 
     private MapView mMapView;
     private Sprite mDefaultMarker;
@@ -59,9 +59,10 @@ public final class SpriteFactory {
         if (mNextId < 0) {
             throw new TooManySpritesException();
         }
-        String id = SPRITE_ID_PREFIX + ++mNextId;
+        int idNumber = ++mNextId;
+        String id = String.format(SPRITE_ID_FORMAT, idNumber);
 
-        return new Sprite(id, bitmap);
+        return new Sprite(id, idNumber, bitmap);
     }
 
     public Sprite fromDrawable(Drawable drawable) {
@@ -70,7 +71,6 @@ public final class SpriteFactory {
 
         return fromDrawable(drawable, width, height);
     }
-
 
     public Sprite fromDrawable(Drawable drawable, int width, int height) {
         if ((width < 0) || (height < 0)) {

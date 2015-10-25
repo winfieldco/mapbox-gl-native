@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -70,6 +71,14 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView.addMarker(generateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
         mMapView.addMarker(generateMarker("San Marino", 43.942360, 12.457777, "#795548"));
         mMapView.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
+
+        mMapView.setOnMapLongClickListener(new MapView.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(@NonNull LatLng point) {
+                mMapView.removeAllAnnotations();
+                Snackbar.make(mMapView, "Remove All", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private MarkerOptions generateMarker(String title, double lat, double lng, String color) {

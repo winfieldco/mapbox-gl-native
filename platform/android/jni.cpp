@@ -1134,6 +1134,17 @@ void JNICALL nativeSetSprite(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
     nativeMapView->getMap().setSprite(symbolName, spriteImage);
 }
 
+void JNICALL nativeRemoveSprite(JNIEnv *env, jobject obj,
+    jlong nativeMapViewPtr, jstring symbol) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveSprite");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    const std::string symbolName = std_string_from_jstring(env, symbol);
+
+    nativeMapView->getMap().removeSprite(symbolName);
+}
+
 void JNICALL nativeSetVisibleCoordinateBounds(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
         jobjectArray coordinates, jobject padding, jdouble direction, jlong duration) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetVisibleCoordinateBounds");
@@ -1861,6 +1872,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetAnnotationsInBounds", "(JLcom/mapbox/mapboxsdk/geometry/BoundingBox;)[J",
          reinterpret_cast<void *>(&nativeGetAnnotationsInBounds)},
         {"nativeSetSprite", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeSetSprite)},
+        {"nativeRemoveSprite", "(JLjava/lang/String;)V", reinterpret_cast<void *>(&nativeRemoveSprite)},
         {"nativeSetVisibleCoordinateBounds", "(J[Lcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/RectF;DJ)V",
                 reinterpret_cast<void *>(&nativeSetVisibleCoordinateBounds)},
         {"nativeOnLowMemory", "(J)V", reinterpret_cast<void *>(&nativeOnLowMemory)},

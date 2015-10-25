@@ -36,6 +36,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.SparseIntArray;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.InputDevice;
@@ -202,6 +203,7 @@ public final class MapView extends FrameLayout {
     private InfoWindowAdapter mInfoWindowAdapter;
     private SpriteFactory mSpriteFactory;
     private ArrayList<Sprite> mSprites = new ArrayList<>();
+    private SparseIntArray mSpritesRefCount = new SparseIntArray();
 
     // Used for the Mapbox Logo
     private ImageView mLogoView;
@@ -1649,6 +1651,9 @@ public final class MapView extends FrameLayout {
                 throw new SpriteBitmapChangedException();
             }
         }
+        int id = icon.getIdNumber();
+        int refCount = mSpritesRefCount.get(id, 0) + 1;
+        mSpritesRefCount.put(id, refCount);
         marker.setTopOffsetPixels(getTopOffsetPixelsForSprite(icon));
         return marker;
     }
@@ -1813,6 +1818,21 @@ public final class MapView extends FrameLayout {
         return new ArrayList<>(polygons);
     }
 
+    private void markerCleanup(Annotation annotation) {
+        if (annotation instanceof Marker) {
+            Marker marker = (Marker) annotation;
+            marker.hideInfoWindow();
+            Sprite icon = marker.getIcon();
+            int id = icon.getIdNumber();
+            int refCount = mSpritesRefCount.get(id) - 1;
+            if (refCount < 1) {
+                mSprites.remove(icon);
+                mNativeMapView.removeSprite(icon.getId());
+                mSpritesRefCount.delete(id);
+            }
+        }
+    }
+
     /**
      * Removes an annotation from the map.
      *
@@ -1824,9 +1844,7 @@ public final class MapView extends FrameLayout {
             throw new NullPointerException("annotation is null");
         }
 
-        if (annotation instanceof Marker) {
-            ((Marker) annotation).hideInfoWindow();
-        }
+        markerCleanup(annotation);
         long id = annotation.getId();
         mNativeMapView.removeAnnotation(id);
         mAnnotations.remove(annotation);
@@ -1863,9 +1881,7 @@ public final class MapView extends FrameLayout {
             Annotation annotation = mAnnotations.get(i);
             long id = annotation.getId();
             ids[i] = id;
-            if (annotation instanceof Marker) {
-                ((Marker) annotation).hideInfoWindow();
-            }
+            markerCleanup(annotation);
         }
 
         mNativeMapView.removeAnnotations(ids);
@@ -1915,8 +1931,7 @@ public final class MapView extends FrameLayout {
             return 0;
         }
 
-        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(sprite.getId())
-                * mScreenDensity);
+        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(sprite.getId()) * mScreenDensity);
     }
 
     /**
