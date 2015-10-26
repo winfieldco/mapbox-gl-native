@@ -20,6 +20,8 @@
         '../platform/default/thread.cpp',
         '../platform/qt/async_task.cpp',
         '../platform/qt/async_task_p.hpp',
+        '../platform/qt/asset_context_qt.cpp',
+        '../platform/qt/asset_context_qt.hpp',
         '../platform/qt/http_context_qt.cpp',
         '../platform/qt/http_context_qt.hpp',
         '../platform/qt/http_request_qt.cpp',
