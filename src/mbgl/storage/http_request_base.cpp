@@ -2,6 +2,8 @@
 
 #include <mbgl/util/chrono.hpp>
 
+#include <cstdio>
+
 namespace mbgl {
 
 int64_t HTTPRequestBase::parseCacheControl(const char *value) {
