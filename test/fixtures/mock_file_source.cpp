@@ -3,6 +3,7 @@
 
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <algorithm>
 #include <unordered_map>
@@ -36,9 +37,8 @@ public:
 class MockFileSource::Impl {
 public:
     Impl(Type type, const std::string& match)
-        : type_(type), match_(match), timer_(util::RunLoop::getLoop()) {
-        timer_.start(timeout, timeout, [this] { dispatchPendingRequests(); });
-        timer_.unref();
+        : type_(type), match_(match) {
+        timer_.start(timeout, [this] { dispatchPendingRequests(); });
     }
 
     ~Impl() {
@@ -63,7 +63,7 @@ private:
     Type type_;
     std::string match_;
     std::unordered_map<FileRequest*, std::pair<Resource, Callback>> pendingRequests_;
-    uv::timer timer_;
+    util::Timer timer_;
 
     std::function<void(void)> requestEnqueuedCallback_;
 };
