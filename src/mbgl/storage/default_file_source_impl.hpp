@@ -5,6 +5,7 @@
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <set>
 #include <unordered_map>
@@ -18,7 +19,7 @@ public:
     const Resource resource;
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
-    std::unique_ptr<uv::timer> timerRequest;
+    std::unique_ptr<util::Timer> timerRequest;
 
     inline DefaultFileRequest(const Resource& resource_)
         : resource(resource_) {}
