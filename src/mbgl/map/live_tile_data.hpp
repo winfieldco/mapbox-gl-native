@@ -17,6 +17,7 @@ public:
                  std::unique_ptr<AnnotationTile>,
                  Style&,
                  const SourceInfo&,
+                 const MapMode,
                  std::function<void ()> callback);
     ~LiveTileData();
 

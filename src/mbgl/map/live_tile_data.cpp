@@ -16,10 +16,11 @@ LiveTileData::LiveTileData(const TileID& id_,
                            std::unique_ptr<AnnotationTile> tile_,
                            Style& style,
                            const SourceInfo& source,
+                           const MapMode mode_,
                            std::function<void()> callback)
     : TileData(id_),
       worker(style.workers),
-      tileWorker(id, source.source_id, style, style.layers, state),
+      tileWorker(id, source.source_id, style, style.layers, state, mode_),
       tile(std::move(tile_)) {
     state = State::loaded;
 

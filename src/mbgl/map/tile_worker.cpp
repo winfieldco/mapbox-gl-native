@@ -19,13 +19,15 @@ TileWorker::TileWorker(TileID id_,
                        std::string sourceID_,
                        Style& style_,
                        std::vector<util::ptr<StyleLayer>> layers_,
-                       const std::atomic<TileData::State>& state_)
+                       const std::atomic<TileData::State>& state_,
+                       const MapMode mode_)
     : layers(std::move(layers_)),
       id(id_),
       sourceID(sourceID_),
       parameters(id.z),
       style(style_),
-      state(state_) {
+      state(state_),
+      mode(mode_) {
     assert(style.sprite);
 }
 
@@ -220,7 +222,7 @@ void TileWorker::createCircleBucket(const GeometryTileLayer& layer,
 
 void TileWorker::createSymbolBucket(const GeometryTileLayer& layer,
                                     const StyleBucket& styleBucket) {
-    auto bucket = std::make_unique<SymbolBucket>(id.overscaling, id.z);
+    auto bucket = std::make_unique<SymbolBucket>(id.overscaling, id.z, mode);
 
     const float z = id.z;
     auto& layout = bucket->layout;

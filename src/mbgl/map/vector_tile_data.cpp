@@ -14,14 +14,16 @@ using namespace mbgl;
 
 VectorTileData::VectorTileData(const TileID& id_,
                                Style& style_,
-                               const SourceInfo& source_)
+                               const SourceInfo& source_,
+                               const MapMode mode_)
     : TileData(id_),
       worker(style_.workers),
       tileWorker(id_,
                  source_.source_id,
                  style_,
                  style_.layers,
-                 state),
+                 state,
+                 mode_),
       source(source_) {
 }
 

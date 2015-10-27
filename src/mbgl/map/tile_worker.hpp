@@ -3,6 +3,7 @@
 
 #include <mapbox/variant.hpp>
 
+#include <mbgl/map/mode.hpp>
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -43,7 +44,8 @@ public:
                std::string sourceID,
                Style&,
                std::vector<util::ptr<StyleLayer>>,
-               const std::atomic<TileData::State>&);
+               const std::atomic<TileData::State>&,
+               const MapMode);
     ~TileWorker();
 
     TileParseResult parseAllLayers(const GeometryTile&, PlacementConfig);
@@ -72,6 +74,7 @@ private:
 
     Style& style;
     const std::atomic<TileData::State>& state;
+    const MapMode mode;
 
     std::unique_ptr<CollisionTile> collisionTile;
 

@@ -18,7 +18,7 @@ class Request;
 class VectorTileData : public TileData {
 public:
     VectorTileData(
-        const TileID&, Style&, const SourceInfo&);
+        const TileID&, Style&, const SourceInfo&, const MapMode);
     ~VectorTileData();
 
     Bucket* getBucket(const StyleLayer&) override;

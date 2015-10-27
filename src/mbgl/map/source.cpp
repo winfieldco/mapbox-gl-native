@@ -286,7 +286,7 @@ TileData::State Source::addTile(MapData& data,
 
         // If we don't find working tile data, we're just going to load it.
         if (info.type == SourceType::Vector) {
-            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info);
+            auto tileData = std::make_shared<VectorTileData>(normalized_id, style, info, data.mode);
             tileData->request(data.pixelRatio, callback);
             new_tile.data = tileData;
         } else if (info.type == SourceType::Raster) {
@@ -295,7 +295,7 @@ TileData::State Source::addTile(MapData& data,
             new_tile.data = tileData;
         } else if (info.type == SourceType::Annotations) {
             new_tile.data = std::make_shared<LiveTileData>(normalized_id,
-                    data.getAnnotationManager()->getTile(normalized_id), style, info, callback);
+                    data.getAnnotationManager()->getTile(normalized_id), style, info, data.mode, callback);
         } else {
             throw std::runtime_error("source type not implemented");
         }
