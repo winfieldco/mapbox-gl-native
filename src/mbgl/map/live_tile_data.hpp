@@ -20,6 +20,7 @@ public:
                  std::function<void ()> callback);
     ~LiveTileData();
 
+    void parse(std::function<void()> callback);
     bool parsePending(std::function<void ()> callback) override;
 
     void redoPlacement(PlacementConfig config) override;

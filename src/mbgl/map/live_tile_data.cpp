@@ -22,23 +22,19 @@ LiveTileData::LiveTileData(const TileID& id_,
       tileWorker(id, source.source_id, style, style.layers, state),
       tile(std::move(tile_)) {
     state = State::loaded;
-
-    if (!tile) {
-        state = State::parsed;
-        return;
-    }
-
-    parsePending(callback);
+    parse(callback);
 }
 
-bool LiveTileData::parsePending(std::function<void()> callback) {
-    if (workRequest || (state != State::loaded && state != State::partial)) {
-        return false;
-    }
-
+void LiveTileData::parse(std::function<void()> callback) {
+    // Kick off a fresh parse of this tile. This happens when the tile is new, or
+    // when tile data changed. Replacing the workdRequest will cancel a pending work
+    // request in case there is one.
     workRequest.reset();
     workRequest = worker.parseLiveTile(tileWorker, *tile, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
+        if (state == State::obsolete) {
+            return;
+        }
 
         if (result.is<TileParseResultBuckets>()) {
             auto& resultBuckets = result.get<TileParseResultBuckets>();
@@ -60,17 +56,52 @@ bool LiveTileData::parsePending(std::function<void()> callback) {
                 redoPlacement();
             }
         } else {
-            error = result.get<std::string>();
+            std::stringstream message;
+            message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
+            error = message.str();
             state = State::obsolete;
         }
 
         callback();
+    });
+}
 
-        // The target configuration could have changed since we started placement. In this case,
-        // we're starting another placement run.
-        if (!workRequest && placedConfig != targetConfig) {
-            redoPlacement();
+bool LiveTileData::parsePending(std::function<void()> callback) {
+    if (workRequest) {
+        // There's already parsing or placement going on.
+        return false;
+    }
+
+    workRequest.reset();
+    workRequest = worker.parsePendingVectorTileLayers(tileWorker, [this, callback] (TileParseResult result) {
+        workRequest.reset();
+        if (state == State::obsolete) {
+            return;
         }
+
+        if (result.is<TileParseResultBuckets>()) {
+            auto& resultBuckets = result.get<TileParseResultBuckets>();
+            state = resultBuckets.state;
+
+            // Move over all buckets we received in this parse request, potentially overwriting
+            // existing buckets in case we got a refresh parse.
+            for (auto& bucket : resultBuckets.buckets) {
+                buckets[bucket.first] = std::move(bucket.second);
+            }
+
+            // The target configuration could have changed since we started placement. In this case,
+            // we're starting another placement run.
+            if (placedConfig != targetConfig) {
+                redoPlacement();
+            }
+        } else {
+            std::stringstream message;
+            message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
+            error = message.str();
+            state = State::obsolete;
+        }
+
+        callback();
     });
 
     return true;
