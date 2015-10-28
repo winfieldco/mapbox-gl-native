@@ -157,7 +157,7 @@ QMapboxGL::Coordinate QMapboxGL::coordinate() const
 void QMapboxGL::setCoordinate(const Coordinate &coordinate_, int milliseconds)
 {
     d_ptr->mapObj->setLatLng(
-        { coordinate_.first, coordinate_.second }, std::chrono::milliseconds(milliseconds));
+        { coordinate_.first, coordinate_.second }, mbgl::Duration(std::chrono::milliseconds(milliseconds)));
 }
 
 void QMapboxGL::setCoordinateZoom(const Coordinate &coordinate_, double zoom_, int milliseconds)
