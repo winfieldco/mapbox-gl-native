@@ -45,13 +45,6 @@
         'cflags_cc': [
           '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
         ],
-        'conditions': [
-          ['cxx_host != "clang"', {
-            'cflags_cc': [
-              '-fabi-version=0',
-            ],
-          }],
-        ]
       }],
     ],
     'target_conditions': [
@@ -92,8 +85,8 @@
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '0',
           'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
-          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
           'DEAD_CODE_STRIPPING': 'NO',
+          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'NO',
           'OTHER_CPLUSPLUSFLAGS': [ '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common']
         }
       },
@@ -103,8 +96,8 @@
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '3',
           'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
-          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
           'DEAD_CODE_STRIPPING': 'NO',
+          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'NO'
         }
       },
     },

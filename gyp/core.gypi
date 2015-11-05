@@ -31,7 +31,6 @@
           '<@(libuv_cflags)',
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
-          '<@(geojsonvt_cflags)',
           '<@(variant_cflags)',
           '<@(rapidjson_cflags)',
           '<@(earcut_cflags)',
@@ -50,7 +49,6 @@
         ],
         'libraries': [
           '<@(libuv_static_libs)',
-          '<@(geojsonvt_static_libs)',
         ],
       },
 
