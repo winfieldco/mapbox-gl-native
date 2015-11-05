@@ -26,8 +26,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/gl/debugging.hpp>
 
-#include <rapidjson/error/en.h>
-
 #include <algorithm>
 
 namespace mbgl {
@@ -166,7 +164,7 @@ void Source::load() {
 
         if (d.HasParseError()) {
             std::stringstream message;
-            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
+            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << d.GetParseError();
             emitSourceLoadingFailed(message.str());
             return;
         }

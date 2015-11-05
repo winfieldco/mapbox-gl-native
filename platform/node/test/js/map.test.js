@@ -107,7 +107,7 @@ test('Map', function(t) {
             mbgl.once('message', function(msg) {
                 t.equal(msg.severity, 'ERROR');
                 t.equal(msg.class, 'ParseStyle');
-                t.ok(msg.text.match(/Invalid value/));
+                t.ok(msg.text.match(/Expect either an object or array at root/));
 
                 map.release();
                 t.end();

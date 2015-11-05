@@ -32,14 +32,12 @@
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(variant_cflags)',
-          '<@(rapidjson_cflags)',
           '<@(earcut_cflags)',
         ],
         'cflags': [
           '<@(libuv_cflags)',
           '<@(opengl_cflags)',
           '<@(variant_cflags)',
-          '<@(rapidjson_cflags)',
           '<@(earcut_cflags)',
           '-fPIC'
         ],

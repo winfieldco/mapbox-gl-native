@@ -106,7 +106,6 @@
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
           '<@(variant_cflags)',
-          '<@(rapidjson_cflags)',
           '<@(earcut_cflags)',
         ],
         'ldflags': [
