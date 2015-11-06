@@ -1,8 +1,11 @@
 package com.mapbox.mapboxsdk.geometry;
 
 /**
+ * @deprecated Use {@link LatLngBounds}
+ *
  * Implementation of iOS MGLCoordinateBounds
  */
+@Deprecated
 public class CoordinateBounds {
 
     private LatLng southWest;

@@ -7,8 +7,13 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * @deprecated Use {@link LatLngBounds}
+ *
  * A rectangular geographical area defined in latitude and longitude units.
+ *
  */
+// TODO bring back ILatLng but deprecate
+@Deprecated
 public final class BoundingBox implements Parcelable, Serializable {
 
     private final double mLatNorth;

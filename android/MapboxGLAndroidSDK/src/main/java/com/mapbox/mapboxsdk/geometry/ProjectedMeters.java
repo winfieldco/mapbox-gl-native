@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 
-public class ProjectedMeters implements IProjectedMeters, Parcelable, Serializable {
+public class ProjectedMeters implements Parcelable, Serializable {
 
     public static final Creator<ProjectedMeters> CREATOR = new Creator<ProjectedMeters>() {
         public ProjectedMeters createFromParcel(Parcel in) {
@@ -35,12 +35,10 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable, Serializab
         easting = in.readDouble();
     }
 
-    @Override
     public double getNorthing() {
         return northing;
     }
 
-    @Override
     public double getEasting() {
         return easting;
     }

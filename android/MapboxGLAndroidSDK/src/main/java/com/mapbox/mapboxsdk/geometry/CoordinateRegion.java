@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.geometry;
 /**
  * Implementation of iOS MKCoordinateRegion
  */
-public class CoordinateRegion {
+public class CoordinateRegion { // TODO implement parcelable?
     private LatLng center;
     private CoordinateSpan span;
 
@@ -16,15 +16,26 @@ public class CoordinateRegion {
         return center;
     }
 
-    public void setCenter(final LatLng center) {
-        this.center = center;
-    }
-
     public CoordinateSpan getSpan() {
         return span;
     }
 
-    public void setSpan(final CoordinateSpan span) {
-        this.span = span;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CoordinateRegion that = (CoordinateRegion) o;
+
+        if (center != null ? !center.equals(that.center) : that.center != null) return false;
+        return !(span != null ? !span.equals(that.span) : that.span != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = center != null ? center.hashCode() : 0;
+        result = 31 * result + (span != null ? span.hashCode() : 0);
+        return result;
     }
 }

@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.geometry;
 /**
  * Implementation of iOS MKCoordinateSpan
  */
-public class CoordinateSpan {
+public class CoordinateSpan { // TODO implement parcelable?
 
     private double latitudeSpan;
     private double longitudeSpan;
@@ -17,27 +17,30 @@ public class CoordinateSpan {
         return latitudeSpan;
     }
 
-    public void setLatitudeSpan(final double latitudeSpan) {
-        this.latitudeSpan = latitudeSpan;
-    }
-
     public double getLongitudeSpan() {
         return longitudeSpan;
-    }
-
-    public void setLongitudeSpan(final double longitudeSpan) {
-        this.longitudeSpan = longitudeSpan;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof CoordinateSpan) {
-            CoordinateSpan other = (CoordinateSpan) o;
-            return longitudeSpan == other.getLongitudeSpan()
-                    && latitudeSpan == other.getLatitudeSpan();
-        }
-        return false;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CoordinateSpan that = (CoordinateSpan) o;
+
+        if (Double.compare(that.latitudeSpan, latitudeSpan) != 0) return false;
+        return Double.compare(that.longitudeSpan, longitudeSpan) == 0;
+
     }
 
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(latitudeSpan);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(longitudeSpan);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

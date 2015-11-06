@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.constants.MathConstants;
 
 import java.io.Serializable;
 
-public class LatLng implements ILatLng, Parcelable, Serializable {
+public class LatLng implements Parcelable {
 
     public static final Parcelable.Creator<LatLng> CREATOR = new Parcelable.Creator<LatLng>() {
         public LatLng createFromParcel(Parcel in) {
@@ -35,7 +35,8 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
 
     /**
      * Construct a new latitude, longitude point given float arguments
-     * @param latitude Latitude in degrees
+     *
+     * @param latitude  Latitude in degrees
      * @param longitude Longitude in degrees
      */
     public LatLng(double latitude, double longitude) {
@@ -45,9 +46,10 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
 
     /**
      * Construct a new latitude, longitude, altitude point given float arguments
-     * @param latitude Latitude in degrees
+     *
+     * @param latitude  Latitude in degrees
      * @param longitude Longitude in degress
-     * @param altitude Altitude in meters
+     * @param altitude  Altitude in meters
      */
     public LatLng(double latitude, double longitude, double altitude) {
         this.latitude = latitude;
@@ -57,6 +59,7 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
 
     /**
      * Transform a Location into a LatLng point
+     *
      * @param location Android Location
      */
     public LatLng(Location location) {
@@ -65,12 +68,13 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
 
     /**
      * Clone an existing latitude longitude point
-     * @param aLatLng LatLng
+     *
+     * @param other LatLng
      */
-    public LatLng(LatLng aLatLng) {
-        this.latitude = aLatLng.latitude;
-        this.longitude = aLatLng.longitude;
-        this.altitude = aLatLng.altitude;
+    public LatLng(LatLng other) {
+        this.latitude = other.latitude;
+        this.longitude = other.longitude;
+        this.altitude = other.altitude;
     }
 
     protected LatLng(Parcel in) {
@@ -79,29 +83,14 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
         altitude = in.readDouble();
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    @Override
     public double getLatitude() {
         return latitude;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    @Override
     public double getLongitude() {
         return longitude;
     }
 
-    public void setAltitude(double altitude) {
-        this.altitude = altitude;
-    }
-
-    @Override
     public double getAltitude() {
         return altitude;
     }
@@ -153,6 +142,7 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
 
     /**
      * Calculate distance between two points
+     *
      * @param other Other LatLng to compare to
      * @return distance in meters
      */

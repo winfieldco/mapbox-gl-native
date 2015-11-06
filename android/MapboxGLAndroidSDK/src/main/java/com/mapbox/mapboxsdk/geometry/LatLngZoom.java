@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 
-public class LatLngZoom extends LatLng implements Parcelable, Serializable {
+public class LatLngZoom extends LatLng implements Parcelable {
 
     public static final Parcelable.Creator<LatLngZoom> CREATOR = new Parcelable.Creator<LatLngZoom>() {
         public LatLngZoom createFromParcel(Parcel in) {
@@ -34,6 +34,11 @@ public class LatLngZoom extends LatLng implements Parcelable, Serializable {
         this.zoom = zoom;
     }
 
+    public LatLngZoom(LatLngZoom other) {
+        super(other);
+        zoom = other.getZoom();
+    }
+
     private LatLngZoom(Parcel in) {
         super(in);
         zoom = in.readDouble();
@@ -41,10 +46,6 @@ public class LatLngZoom extends LatLng implements Parcelable, Serializable {
 
     public double getZoom() {
         return zoom;
-    }
-
-    public void setZoom(double zoom) {
-        this.zoom = zoom;
     }
 
     @Override
