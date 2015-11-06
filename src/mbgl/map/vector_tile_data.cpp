@@ -20,7 +20,10 @@ VectorTileData::VectorTileData(const TileID& id_,
       worker(style_.workers),
       tileWorker(id_,
                  sourceID,
-                 style_,
+                 *style_.spriteAtlas,
+                 *style_.spriteStore,
+                 *style_.glyphAtlas,
+                 *style_.glyphStore,
                  state),
       monitor(std::move(monitor_))
 {
