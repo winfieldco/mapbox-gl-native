@@ -4,6 +4,7 @@
 
 #include <mbgl/sprite/sprite_store.hpp>
 
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
 
@@ -188,7 +189,7 @@ protected:
     void runTest(const SpriteParams& params, FileSource* fileSource, SpriteTestCallback callback) {
         util::RunLoop loop(uv_default_loop());
 
-        async_ = std::make_unique<uv::async>(loop.get(), [&] { loop.stop(); });
+        async_ = std::make_unique<util::AsyncTask>([&] { loop.stop(); });
         async_->unref();
 
         const util::ThreadContext context = {"Map", util::ThreadType::Map, util::ThreadPriority::Regular};
@@ -206,7 +207,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<uv::async> async_;
+    std::unique_ptr<util::AsyncTask> async_;
 };
 
 TEST_F(SpriteTest, LoadingSuccess) {

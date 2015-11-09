@@ -6,9 +6,9 @@
 #include <mbgl/map/still_image.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/uv_detail.hpp>
 
 using namespace mbgl;
 
@@ -29,7 +29,7 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
 
     std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
 
-    uv::async endTest(loop.get(), [&map, &loop] {
+    util::AsyncTask endTest([&map, &loop] {
         map.reset();
         loop.stop();
     });
