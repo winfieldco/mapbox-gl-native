@@ -29,7 +29,7 @@ public:
     static NAN_METHOD(Release);
     static NAN_METHOD(DumpDebugLogs);
 
-    void startRender(std::unique_ptr<NodeMap::RenderOptions> options);
+    void startRender(std::unique_ptr<NodeMap::RenderOptions>);
     void renderFinished();
 
     void release();
@@ -43,8 +43,8 @@ public:
     NodeMap(v8::Local<v8::Object>);
     ~NodeMap();
 
-    HeadlessView view;
-    NodeFileSource fs;
+    std::unique_ptr<HeadlessView> view;
+    std::unique_ptr<NodeFileSource> fs;
     std::unique_ptr<Map> map;
 
     std::exception_ptr error;

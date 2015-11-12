@@ -3,7 +3,6 @@
 #include "util/async_queue.hpp"
 
 #include <mbgl/storage/request.hpp>
-#include <iostream>
 
 namespace mbgl {
 
