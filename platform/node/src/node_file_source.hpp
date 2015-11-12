@@ -14,9 +14,9 @@ namespace mbgl {
 class NodeFileSource : public FileSource {
 public:
     NodeFileSource(v8::Local<v8::Object>);
-    ~NodeFileSource();
+    ~NodeFileSource() override;
 
-    std::unique_ptr<FileRequest> request(const Resource&, Callback);
+    std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
 private:
     Nan::Persistent<v8::Object> options;
