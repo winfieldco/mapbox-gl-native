@@ -45,7 +45,7 @@ TEST_F(Storage, HTTPCoalescing) {
 
     Request* reqs[total];
     for (int i = 0; i < total; i++) {
-        reqs[i] = fs.request(resource, [&complete, &fs, &reqs, i] (const Response &res) {
+        reqs[i] = fs.request(resource, [&complete, &fs, &reqs, i] (Response res) {
             fs.cancel(reqs[i]);
             complete(res);
         });
@@ -67,7 +67,7 @@ TEST_F(Storage, HTTPMultiple) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?expires=2147483647" };
     Request* req1 = nullptr;
     Request* req2 = nullptr;
-    req1 = fs.request(resource, [&] (const Response &res) {
+    req1 = fs.request(resource, [&] (Response res) {
         EXPECT_EQ(nullptr, reference);
         reference = &res;
 
@@ -80,7 +80,7 @@ TEST_F(Storage, HTTPMultiple) {
         EXPECT_EQ("", res.etag);
 
         // Start a second request for the same resource after the first one has been completed.
-        req2 = fs.request(resource, [&] (const Response &res2) {
+        req2 = fs.request(resource, [&] (Response res2) {
             // Make sure we get the same object ID as before.
             EXPECT_EQ(reference, &res2);
 
@@ -118,7 +118,7 @@ TEST_F(Storage, HTTPStale) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
     Request* req1 = nullptr;
     Request* req2 = nullptr;
-    req1 = fs.request(resource, [&] (const Response &res) {
+    req1 = fs.request(resource, [&] (Response res) {
         // Do not cancel the request right away.
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -136,7 +136,7 @@ TEST_F(Storage, HTTPStale) {
         updates++;
 
         // Start a second request for the same resource after the first one has been completed.
-        req2 = fs.request(resource, [&] (const Response &res2) {
+        req2 = fs.request(resource, [&] (Response res2) {
             EXPECT_EQ(nullptr, res2.error);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Hello World!", *res2.data);
