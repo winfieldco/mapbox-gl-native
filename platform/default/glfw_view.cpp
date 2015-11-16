@@ -154,6 +154,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             if (!mods)
                 view->map->resetNorth();
             break;
+        case GLFW_KEY_Z:
+            view->nextOrientation();
+            break;
         case GLFW_KEY_Q:
             view->clearAnnotations();
             break;
@@ -217,6 +220,16 @@ GLFWView::makeSpriteImage(int width, int height, float pixelRatio) {
     }
 
     return std::make_shared<mbgl::SpriteImage>(width, height, pixelRatio, std::move(pixels));
+}
+
+void GLFWView::nextOrientation() {
+    using NO = mbgl::NorthOrientation;
+    switch (map->getNorthOrientation()) {
+        case NO::Upwards: map->setNorthOrientation(NO::Rightwards); break;
+        case NO::Rightwards: map->setNorthOrientation(NO::Downwards); break;
+        case NO::Downwards: map->setNorthOrientation(NO::Leftwards); break;
+        default: map->setNorthOrientation(NO::Upwards); break;
+    }
 }
 
 void GLFWView::addRandomCustomPointAnnotations(int count) {
