@@ -342,18 +342,25 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
 }
 
 void GLFWView::run() {
-    while (!glfwWindowShouldClose(window)) {
-        glfwWaitEvents();
-        const bool dirty = !clean.test_and_set();
-        if (dirty) {
-            const double started = glfwGetTime();
-            map->renderSync();
-            report(1000 * (glfwGetTime() - started));
-            if (benchmark) {
-                map->update(mbgl::Update::Repaint);
+    timer.start(mbgl::Duration::zero(), std::chrono::milliseconds(1000 / 60), [&] {
+        glfwPollEvents();
+
+        if (glfwWindowShouldClose(window)) {
+            loop.stop();
+        } else {
+            const bool dirty = !clean.test_and_set();
+            if (dirty) {
+                const double started = glfwGetTime();
+                map->renderSync();
+                report(1000 * (glfwGetTime() - started));
+                if (benchmark) {
+                    map->update(mbgl::Update::Repaint);
+                }
             }
         }
-    }
+    });
+
+    loop.run();
 }
 
 float GLFWView::getPixelRatio() const {
@@ -377,12 +384,10 @@ void GLFWView::deactivate() {
 }
 
 void GLFWView::notify() {
-    glfwPostEmptyEvent();
 }
 
 void GLFWView::invalidate() {
     clean.clear();
-    glfwPostEmptyEvent();
 }
 
 void GLFWView::beforeRender() {
@@ -414,7 +419,6 @@ void GLFWView::setChangeStyleCallback(std::function<void()> callback) {
 
 void GLFWView::setShouldClose() {
     glfwSetWindowShouldClose(window, true);
-    glfwPostEmptyEvent();
 }
 
 void GLFWView::setWindowTitle(const std::string& title) {

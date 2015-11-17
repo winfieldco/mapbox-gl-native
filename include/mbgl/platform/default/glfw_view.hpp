@@ -3,6 +3,9 @@
 
 #include <mbgl/mbgl.hpp>
 
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/timer.hpp>
+
 #ifdef MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
 #endif
@@ -85,6 +88,9 @@ private:
 
     GLFWwindow *window = nullptr;
     std::atomic_flag clean = ATOMIC_FLAG_INIT;
+
+    mbgl::util::RunLoop loop;
+    mbgl::util::Timer timer;
 };
 
 #endif
