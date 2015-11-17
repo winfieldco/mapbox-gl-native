@@ -4,7 +4,6 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
-
 #include <mbgl/sprite/sprite_atlas.hpp>
 
 namespace mbgl {
@@ -96,7 +95,7 @@ public:
 
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;
-    
+
     SpriteAtlas *sourceSpriteAtlas;
 };
 

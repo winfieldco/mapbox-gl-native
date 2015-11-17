@@ -4,10 +4,9 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/point_annotation_impl.hpp>
 #include <mbgl/annotation/shape_annotation_impl.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
-
-#include <mbgl/sprite/sprite_atlas.hpp>
 
 #include <string>
 #include <vector>

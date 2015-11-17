@@ -179,7 +179,7 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
     // needed by this tile.
     if (!parameters.partialParse) {
         bucket->addFeatures(parameters.tileUID,
-                            sourceSpriteAtlas ? *sourceSpriteAtlas : parameters.spriteAtlas,
+                            (sourceSpriteAtlas ? *sourceSpriteAtlas : parameters.spriteAtlas),
                             parameters.glyphAtlas,
                             parameters.glyphStore,
                             parameters.collisionTile);

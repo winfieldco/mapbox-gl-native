@@ -33,9 +33,7 @@ struct FrameData {
     std::array<uint16_t, 2> framebufferSize;
 };
 
-class MapContext : public Style::Observer,
-    public SpriteStore::Observer
-{
+class MapContext : public Style::Observer, public SpriteStore::Observer {
 public:
     MapContext(View&, FileSource&, MapData&);
     ~MapContext();
@@ -71,9 +69,9 @@ public:
 
     void dumpDebugLogs() const;
     
-    //SpriteStore::Observer implementation
-    void onSpriteLoaded() override { }
-    void onSpriteLoadingFailed(std::exception_ptr) override { }
+    // SpriteStore::Observer implementation
+    void onSpriteLoaded() override {}
+    void onSpriteLoadingFailed(std::exception_ptr) override {}
     
 private:
     // Update the state indicated by the accumulated Update flags, then render.
@@ -104,7 +102,7 @@ private:
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;
-    
+
     std::unique_ptr<SpriteStore> annotationSpriteStore;
     std::unique_ptr<SpriteAtlas> annotationSpriteAtlas;
 };
