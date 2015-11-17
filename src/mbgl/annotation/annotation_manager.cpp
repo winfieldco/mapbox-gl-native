@@ -104,7 +104,7 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID)
     return tile;
 }
 
-void AnnotationManager::updateStyle(Style& style, SpriteAtlas *atlas) {
+void AnnotationManager::updateStyle(Style& style, SpriteAtlas* atlas) {
     // Create annotation source, point layer, and point bucket
     if (!style.getSource(SourceID)) {
         std::unique_ptr<Source> source = std::make_unique<Source>();
