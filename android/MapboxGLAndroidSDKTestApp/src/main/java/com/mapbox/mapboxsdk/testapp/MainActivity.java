@@ -384,6 +384,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), PolylineActivity.class));
                                 return true;
 
+                            case R.id.action_mbtiles:
+                                startActivity(new Intent(getApplicationContext(), MBTilesActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }

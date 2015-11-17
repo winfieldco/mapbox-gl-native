@@ -120,6 +120,12 @@
                 android:icon="@drawable/ic_trending_up_white_24dp"
                 android:title="@string/activity_polyline"/>
 
+            <item
+                android:id="@+id/action_mbtiles"
+                android:checkable="false"
+                android:icon="@drawable/icon"
+                android:title="@string/activity_mbtiles"/>
+
         </menu>
     </item>
 

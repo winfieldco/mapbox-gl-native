@@ -13,6 +13,7 @@
     <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
     <string name="activity_polyline">Polyline Activity</string>
+    <string name="activity_mbtiles">MBTiles Activity</string>
 
     <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
     <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
@@ -66,5 +67,9 @@
     </string-array>
 
     <string name="zoom_botton">Zoom</string>
+
+    <!-- Temporary -->
+    <string name="coming_soon">Coming soon.</string>
+
 
 </resources>

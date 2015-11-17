@@ -60,6 +60,10 @@
             android:name=".PolylineActivity"
             android:label="@string/activity_polyline" />
 
+        <activity
+            android:name=".MBTilesActivity"
+            android:label="@string/activity_mbtiles" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9724157045ff7d083492c6d9ae03e60e8609d461" />
