@@ -23,8 +23,10 @@ Timer::Timer()
 Timer::~Timer() {
 }
 
-void Timer::start(uint64_t timeout, std::function<void()>&& cb) {
-    impl->timer.start(timeout, 0, std::move(cb));
+void Timer::start(Duration timeout, Duration repeat, std::function<void()>&& cb) {
+    impl->timer.start(std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count(),
+                      std::chrono::duration_cast<std::chrono::milliseconds>(repeat).count(),
+                      std::move(cb));
 }
 
 void Timer::stop() {

@@ -2,6 +2,7 @@
 #define MBGL_UTIL_TIMER
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <memory>
 #include <functional>
@@ -14,7 +15,7 @@ public:
     Timer();
     ~Timer();
 
-    void start(uint64_t timeout, std::function<void()>&&);
+    void start(Duration timeout, Duration repeat, std::function<void()>&&);
     void stop();
 
 private:

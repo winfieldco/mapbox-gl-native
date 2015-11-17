@@ -239,8 +239,7 @@ void DefaultFileSource::Impl::reschedule(DefaultFileRequestImpl& request) {
             request.timerRequest = std::make_unique<util::Timer>();
         }
 
-        // timeout is in seconds, but the timer takes milliseconds.
-        request.timerRequest->start(1000 * timeout, [this, &request] {
+        request.timerRequest->start(std::chrono::seconds(timeout), Duration::zero(), [this, &request] {
             assert(!request.realRequest);
             startRealRequest(request);
         });
