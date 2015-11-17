@@ -1,7 +1,6 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/layer/symbol_layer.hpp>
 
 #include <boost/function_output_iterator.hpp>
 
@@ -125,6 +124,11 @@ void AnnotationManager::updateStyle(Style& style, SpriteAtlas *atlas) {
         layer->sourceSpriteAtlas = atlas;
 
         style.addLayer(std::move(layer));
+    } else {
+        SymbolLayer *symbolLayer = dynamic_cast<SymbolLayer *>(style.getLayer(PointLayerID));
+        if (symbolLayer) {
+            symbolLayer->sourceSpriteAtlas = atlas;
+        }
     }
 
     for (const auto& shape : shapeAnnotations) {

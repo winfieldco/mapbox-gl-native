@@ -33,8 +33,9 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
       asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
       texturePool(std::make_unique<TexturePool>()),
-      annotationSpriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
-      annotationSpriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *annotationSpriteStore)) {
+      savedPixelRatio(data.pixelRatio),
+      annotationSpriteStore(nullptr),
+      annotationSpriteAtlas(nullptr) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
@@ -43,13 +44,20 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
     asyncUpdate->unref();
     asyncInvalidate->unref();
 
-    annotationSpriteStore->setObserver(this);
     view.activate();
 }
 
 MapContext::~MapContext() {
     // Make sure we call cleanup() before deleting this object.
     assert(!style);
+}
+
+void MapContext::ensureAnnotationSpriteStore() {
+    if (annotationSpriteStore == nullptr) {
+        annotationSpriteStore = std::make_unique<SpriteStore>(savedPixelRatio);
+        annotationSpriteAtlas = std::make_unique<SpriteAtlas>(512, 512, savedPixelRatio, *annotationSpriteStore);
+        annotationSpriteStore->setObserver(this);
+    }
 }
 
 void MapContext::cleanup() {
@@ -272,6 +280,7 @@ bool MapContext::isLoaded() const {
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    ensureAnnotationSpriteStore();
     auto sprite = annotationSpriteStore->getSprite(symbol);
     if (sprite) {
         return -sprite->height / 2;
@@ -306,6 +315,7 @@ void MapContext::setSprite(const std::string& name, std::shared_ptr<const Sprite
         Log::Info(Event::Sprite, "Ignoring sprite without stylesheet");
         return;
     }
+    ensureAnnotationSpriteStore();
 
     annotationSpriteStore->setSprite(name, sprite);
 

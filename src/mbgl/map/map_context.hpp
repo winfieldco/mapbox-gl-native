@@ -82,6 +82,8 @@ private:
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
 
+    void ensureAnnotationSpriteStore();
+    
     View& view;
     MapData& data;
 
@@ -105,6 +107,7 @@ private:
     TransformState transformState;
     FrameData frameData;
     
+    float savedPixelRatio;
     std::unique_ptr<SpriteStore> annotationSpriteStore;
     std::unique_ptr<SpriteAtlas> annotationSpriteAtlas;
 };
