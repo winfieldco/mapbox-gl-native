@@ -32,7 +32,9 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       data(data_),
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
       asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
-      texturePool(std::make_unique<TexturePool>()) {
+      texturePool(std::make_unique<TexturePool>()),
+      annotationSpriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
+      annotationSpriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *annotationSpriteStore)) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
@@ -41,6 +43,7 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
     asyncUpdate->unref();
     asyncInvalidate->unref();
 
+    annotationSpriteStore->setObserver(this);
     view.activate();
 }
 
@@ -170,7 +173,7 @@ void MapContext::update() {
     data.setAnimationTime(Clock::now());
 
     if (updateFlags & Update::Annotations) {
-        data.getAnnotationManager()->updateStyle(*style);
+        data.getAnnotationManager()->updateStyle(*style, annotationSpriteAtlas.get());
         updateFlags |= Update::Classes;
     }
 
@@ -269,7 +272,7 @@ bool MapContext::isLoaded() const {
 
 double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    auto sprite = style->spriteStore->getSprite(symbol);
+    auto sprite = annotationSpriteStore->getSprite(symbol);
     if (sprite) {
         return -sprite->height / 2;
     } else {
@@ -304,9 +307,9 @@ void MapContext::setSprite(const std::string& name, std::shared_ptr<const Sprite
         return;
     }
 
-    style->spriteStore->setSprite(name, sprite);
+    annotationSpriteStore->setSprite(name, sprite);
 
-    style->spriteAtlas->updateDirty();
+    annotationSpriteAtlas->updateDirty();
 }
 
 void MapContext::onTileDataChanged() {

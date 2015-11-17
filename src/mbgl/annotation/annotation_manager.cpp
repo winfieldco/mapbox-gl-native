@@ -105,7 +105,7 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID)
     return tile;
 }
 
-void AnnotationManager::updateStyle(Style& style) {
+void AnnotationManager::updateStyle(Style& style, SpriteAtlas *atlas) {
     // Create annotation source, point layer, and point bucket
     if (!style.getSource(SourceID)) {
         std::unique_ptr<Source> source = std::make_unique<Source>();
@@ -122,6 +122,7 @@ void AnnotationManager::updateStyle(Style& style) {
         layer->sourceLayer = PointLayerID;
         layer->layout.icon.image = std::string("{sprite}");
         layer->layout.icon.allowOverlap = true;
+        layer->sourceSpriteAtlas = atlas;
 
         style.addLayer(std::move(layer));
     }

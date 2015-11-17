@@ -7,6 +7,8 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+#include <mbgl/sprite/sprite_atlas.hpp>
+
 #include <string>
 #include <vector>
 #include <set>
@@ -31,7 +33,7 @@ public:
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
-    void updateStyle(Style&);
+    void updateStyle(Style&, SpriteAtlas*);
 
     void addTileMonitor(AnnotationTileMonitor&);
     void removeTileMonitor(AnnotationTileMonitor&);
