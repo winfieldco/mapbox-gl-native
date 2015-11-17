@@ -302,6 +302,7 @@ void MapContext::onLowMemory() {
 }
 
 void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (!style) {
         Log::Info(Event::Sprite, "Ignoring sprite without stylesheet");
         return;
