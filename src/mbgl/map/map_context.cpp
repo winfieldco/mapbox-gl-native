@@ -56,7 +56,6 @@ void MapContext::ensureAnnotationSpriteStore() {
     if (annotationSpriteStore == nullptr) {
         annotationSpriteStore = std::make_unique<SpriteStore>(savedPixelRatio);
         annotationSpriteAtlas = std::make_unique<SpriteAtlas>(512, 512, savedPixelRatio, *annotationSpriteStore);
-        annotationSpriteStore->setObserver(this);
     }
 }
 

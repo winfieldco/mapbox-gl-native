@@ -1,5 +1,6 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/style/style.hpp>
 
 #include <boost/function_output_iterator.hpp>
