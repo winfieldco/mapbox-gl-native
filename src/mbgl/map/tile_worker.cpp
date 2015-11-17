@@ -66,8 +66,8 @@ TileParseResult TileWorker::parsePendingLayers() {
             if (!symbolBucket->needsDependencies(*style.glyphStore, *style.spriteStore)) {
                 const SymbolLayer *layerAsSymbolLayer = dynamic_cast<const SymbolLayer*>(&layer);
                 symbolBucket->addFeatures(reinterpret_cast<uintptr_t>(this),
-                                          (layerAsSymbolLayer && layerAsSymbolLayer->sourceSpriteAtlas ?
-                                              *layerAsSymbolLayer->sourceSpriteAtlas :
+                                          (layerAsSymbolLayer && layerAsSymbolLayer->layerSpriteAtlas ?
+                                              *layerAsSymbolLayer->layerSpriteAtlas :
                                               *style.spriteAtlas),
                                           *style.glyphAtlas, *style.glyphStore, *collisionTile);
                 insertBucket(layer.bucketName(), std::move(bucket));

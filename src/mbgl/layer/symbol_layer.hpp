@@ -96,7 +96,7 @@ public:
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;
 
-    SpriteAtlas *sourceSpriteAtlas;
+    SpriteAtlas *layerSpriteAtlas;
 };
 
 }

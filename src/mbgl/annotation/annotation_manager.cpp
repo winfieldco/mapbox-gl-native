@@ -122,13 +122,13 @@ void AnnotationManager::updateStyle(Style& style, SpriteAtlas* atlas) {
         layer->sourceLayer = PointLayerID;
         layer->layout.icon.image = std::string("{sprite}");
         layer->layout.icon.allowOverlap = true;
-        layer->sourceSpriteAtlas = atlas;
+        layer->layerSpriteAtlas = atlas;
 
         style.addLayer(std::move(layer));
     } else {
         SymbolLayer *symbolLayer = dynamic_cast<SymbolLayer *>(style.getLayer(PointLayerID));
         if (symbolLayer) {
-            symbolLayer->sourceSpriteAtlas = atlas;
+            symbolLayer->layerSpriteAtlas = atlas;
         }
     }
 
