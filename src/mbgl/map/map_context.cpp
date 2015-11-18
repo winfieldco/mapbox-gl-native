@@ -33,9 +33,7 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
       asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
       texturePool(std::make_unique<TexturePool>()),
-      savedPixelRatio(data.pixelRatio),
-      annotationSpriteStore(nullptr),
-      annotationSpriteAtlas(nullptr) {
+      savedPixelRatio(data.pixelRatio) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
@@ -253,7 +251,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     glObjectStore.performCleanup();
 
     if (!painter) painter = std::make_unique<Painter>(data);
-    painter->render(*style, transformState, frame);
+    painter->render(*style, transformState, frame, annotationSpriteAtlas.get());
 
     if (data.mode == MapMode::Still) {
         callback(nullptr, view.readStillImage());

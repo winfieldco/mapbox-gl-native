@@ -127,7 +127,7 @@ void Painter::prepareTile(const Tile& tile) {
     config.stencilFunc = { GL_EQUAL, ref, mask };
 }
 
-void Painter::render(const Style& style, TransformState state_, const FrameData& frame_) {
+void Painter::render(const Style& style, TransformState state_, const FrameData& frame_, SpriteAtlas *annotationSpriteAtlas) {
     state = state_;
     frame = frame_;
 
@@ -158,6 +158,9 @@ void Painter::render(const Style& style, TransformState state_, const FrameData&
         spriteAtlas->upload();
         lineAtlas->upload();
         glyphAtlas->upload();
+        if (annotationSpriteAtlas) {
+            annotationSpriteAtlas->upload();
+        }
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {

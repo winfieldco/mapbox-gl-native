@@ -94,7 +94,8 @@ public:
 
     void render(const Style& style,
                 TransformState state,
-                const FrameData& frame);
+                const FrameData& frame,
+                SpriteAtlas *annotationSpriteAtlas);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
