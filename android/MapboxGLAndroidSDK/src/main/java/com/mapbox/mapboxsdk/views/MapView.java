@@ -467,7 +467,20 @@ public final class MapView extends FrameLayout {
         /**
          * Called when the displayed map view changes.
          *
-         * @param change The type of map change event.
+         * @param change Type of map change event, one of {@link #REGION_WILL_CHANGE},
+         *               {@link #REGION_WILL_CHANGE_ANIMATED},
+         *               {@link #REGION_IS_CHANGING},
+         *               {@link #REGION_DID_CHANGE},
+         *               {@link #REGION_DID_CHANGE_ANIMATED},
+         *               {@link #WILL_START_LOADING_MAP},
+         *               {@link #DID_FAIL_LOADING_MAP},
+         *               {@link #DID_FINISH_LOADING_MAP},
+         *               {@link #WILL_START_RENDERING_FRAME},
+         *               {@link #DID_FINISH_RENDERING_FRAME},
+         *               {@link #DID_FINISH_RENDERING_FRAME_FULLY_RENDERED},
+         *               {@link #WILL_START_RENDERING_MAP},
+         *               {@link #DID_FINISH_RENDERING_MAP},
+         *               {@link #DID_FINISH_RENDERING_MAP_FULLY_RENDERED}.
          */
         void onMapChanged(@MapChange int change);
     }
@@ -1871,8 +1884,9 @@ public final class MapView extends FrameLayout {
 
     /**
      * Convenience method for removing a Marker from the map.
-     *
+     * <p/>
      * Calls removeAnnotation() internally
+     *
      * @param marker Marker to remove
      */
     @UiThread
