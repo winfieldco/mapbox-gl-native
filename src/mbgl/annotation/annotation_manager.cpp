@@ -10,7 +10,11 @@ namespace mbgl {
 const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
 
-AnnotationManager::AnnotationManager() = default;
+AnnotationManager::AnnotationManager(float pixelRatio)
+    : spriteStore(pixelRatio),
+      spriteAtlas(512, 512, pixelRatio, spriteStore) {
+}
+
 AnnotationManager::~AnnotationManager() = default;
 
 AnnotationIDs
@@ -105,7 +109,7 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID)
     return tile;
 }
 
-void AnnotationManager::updateStyle(Style& style, SpriteAtlas* atlas) {
+void AnnotationManager::updateStyle(Style& style) {
     // Create annotation source, point layer, and point bucket
     if (!style.getSource(SourceID)) {
         std::unique_ptr<Source> source = std::make_unique<Source>();
@@ -122,14 +126,9 @@ void AnnotationManager::updateStyle(Style& style, SpriteAtlas* atlas) {
         layer->sourceLayer = PointLayerID;
         layer->layout.icon.image = std::string("{sprite}");
         layer->layout.icon.allowOverlap = true;
-        layer->spriteAtlas = atlas;
+        layer->spriteAtlas = &spriteAtlas;
 
         style.addLayer(std::move(layer));
-    } else {
-        SymbolLayer *symbolLayer = dynamic_cast<SymbolLayer *>(style.getLayer(PointLayerID));
-        if (symbolLayer) {
-            symbolLayer->spriteAtlas = atlas;
-        }
     }
 
     for (const auto& shape : shapeAnnotations) {
@@ -156,6 +155,16 @@ void AnnotationManager::addTileMonitor(AnnotationTileMonitor& monitor) {
 
 void AnnotationManager::removeTileMonitor(AnnotationTileMonitor& monitor) {
     monitors.erase(&monitor);
+}
+
+void AnnotationManager::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
+    spriteStore.setSprite(name, sprite);
+    spriteAtlas.updateDirty();
+}
+
+double AnnotationManager::getTopOffsetPixelsForAnnotationSymbol(const std::string& name) {
+    auto sprite = spriteStore.getSprite(name);
+    return sprite ? -sprite->height / 2 : 0;
 }
 
 }

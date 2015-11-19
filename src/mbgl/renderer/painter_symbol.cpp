@@ -192,7 +192,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         const float fontSize = properties.icon.size;
         const float fontScale = fontSize / 1.0f;
 
-        SpriteAtlas *activeSpriteAtlas = (layer.spriteAtlas ? layer.spriteAtlas : spriteAtlas);
+        SpriteAtlas* activeSpriteAtlas = layer.spriteAtlas;
         activeSpriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line
                 || angleOffset != 0 || fontScale != 1 || sdf || state.getPitch() != 0);
 

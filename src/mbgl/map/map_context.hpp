@@ -100,10 +100,6 @@ private:
     size_t sourceCacheSize;
     TransformState transformState;
     FrameData frameData;
-    
-    float savedPixelRatio;
-    std::unique_ptr<SpriteStore> annotationSpriteStore;
-    std::unique_ptr<SpriteAtlas> annotationSpriteAtlas;
 };
 
 }
