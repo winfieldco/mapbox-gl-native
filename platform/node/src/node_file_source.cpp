@@ -2,6 +2,8 @@
 #include "node_request.hpp"
 #include "node_mapbox_gl_native.hpp"
 
+#include <iostream>
+
 namespace mbgl {
 
 class NodeFileSourceRequest : public FileRequest {
@@ -9,12 +11,19 @@ public:
     std::unique_ptr<WorkRequest> workRequest;
 };
 
-NodeFileSource::NodeFileSource(v8::Local<v8::Object> options_) {
-    options.Reset(options_);
+NodeFileSource::NodeFileSource(v8::Local<v8::Object> options_) 
+    : options(options_) {
+    /*
+    options.SetWeak(&options, [](const Nan::WeakCallbackInfo<Nan::Persistent<v8::Object>> &data) {
+        std::cout << &data << std::endl;
+        // data.GetParameter()->Reset();
+    }, Nan::WeakCallbackType::kParameter);
+    */
 }
 
 NodeFileSource::~NodeFileSource() {
     options.Reset();
+    std::cout << "~NodeFileSource" << std::endl;
 }
 
 std::unique_ptr<FileRequest> NodeFileSource::request(const Resource& resource, Callback callback) {

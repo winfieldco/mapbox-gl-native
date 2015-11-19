@@ -5,6 +5,7 @@
 #include <mbgl/util/exception.hpp>
 
 #include <unistd.h>
+#include <iostream>
 
 #if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
 #define UV_ASYNC_PARAMS(handle) uv_async_t *handle, int
@@ -445,6 +446,7 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
 
 NodeMap::~NodeMap() {
     if (valid) release();
+    std::cout << "~NodeMap" << std::endl;
 }
 
 }
