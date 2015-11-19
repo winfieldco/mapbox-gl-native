@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.offline;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * An implementation of MBTiles 1.1
@@ -19,14 +19,26 @@ public class MBTilesArchive {
      * Constructor
      */
 
-    public MBTilesArchive(Context context, String name) throws IOException {
-        Log.d(LOG_TAG, "Constructor: " + name);
+    public MBTilesArchive(Context context, String name)
+            throws IOException {
         database = new MBTilesDatabase(context, name);
     }
 
-    public static MBTilesArchive fromAsset(Context context, String assetName) throws IOException {
+    public MBTilesArchive(Context context, String name, boolean readonly)
+            throws IOException {
+        database = new MBTilesDatabase(context, name, readonly);
+    }
+
+    public static MBTilesArchive fromAsset(Context context, String assetName)
+            throws IOException {
         String name = MBTilesUtils.unpackAsset(context, assetName);
         return new MBTilesArchive(context, name);
+    }
+
+    public static MBTilesArchive fromAsset(Context context, String assetName, boolean readonly)
+            throws IOException {
+        String name = MBTilesUtils.unpackAsset(context, assetName);
+        return new MBTilesArchive(context, name, readonly);
     }
 
     public void close() {
@@ -37,12 +49,16 @@ public class MBTilesArchive {
      * Metadata
      */
 
-    public String getMetada(String name) {
-        return database.getMetada(name);
+    public ArrayList<String> getMetadataKeys() {
+        return database.getMetadataKeys();
     }
 
-    public void setMetada(String name, String value) {
-        throw new UnsupportedOperationException("TODO: The API is read-only.");
+    public String getMetada(String name) {
+        return database.getMetadata(name);
+    }
+
+    public boolean setMetada(String name, String value) {
+        return database.setMetadata(name, value);
     }
 
     /*
@@ -116,6 +132,10 @@ public class MBTilesArchive {
 
     /*
      * Tiles
+     *
+     * If we want to implement further vector tiles support, it'd be better to move this
+     * code as an independent package and then use something like:
+     * https://github.com/square/wire
      */
 
     public byte[] getTileData (int zoomLevel, int tileColumn, int tileRow) {
@@ -123,7 +143,7 @@ public class MBTilesArchive {
         return tileData;
     }
 
-    public void setTileData(int zoomLevel, int tileColumn, int tileRow, String tileData) {
+    public void setTileData(int zoomLevel, int tileColumn, int tileRow, byte[] tileData) {
         throw new UnsupportedOperationException("TODO: The API is read-only.");
     }
 

@@ -48,12 +48,14 @@ public class MBTilesActivity extends AppCompatActivity {
 
             MBTilesArchive archive;
             try {
-                archive = MBTilesArchive.fromAsset(MBTilesActivity.this, "road-trip.mbtiles");
+                // Non-readonly mode.
+                archive = MBTilesArchive.fromAsset(MBTilesActivity.this, "road-trip.mbtiles", false);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
 
+            // Metadata
             Log.d(TAG, "Name: " + archive.getName());
             Log.d(TAG, "Type: " + archive.getType());
             Log.d(TAG, "Version: " + archive.getVersion());
@@ -61,11 +63,18 @@ public class MBTilesActivity extends AppCompatActivity {
             Log.d(TAG, "Format: " + archive.getFormat());
             Log.d(TAG, "Bounds: " + archive.getBounds());
 
+            // Tile
             int zoomLevel = 4;
             int tileColumn = 2;
             int tileRow = 9;
             byte[] tileData = archive.getTileData (zoomLevel, tileColumn, tileRow);
             Log.d(TAG, "tileData: " + tileData);
+
+            // Write mode
+            boolean success = archive.setMetada("testname", "testvalue");
+            Log.d(TAG, "Set success : " + success);
+            Log.d(TAG, "testname: " + archive.getMetada("testname"));
+            Log.d(TAG, "keys: " + archive.getMetadataKeys());
 
             archive.close();
             return null;
