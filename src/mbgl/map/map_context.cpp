@@ -27,9 +27,9 @@
 
 namespace mbgl {
 
-MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
+MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLContextMode contextMode_, const float pixelRatio_)
     : view(view_),
-      data(data_),
+      data(mode_, contextMode_, pixelRatio_),
       asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
       asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
       texturePool(std::make_unique<TexturePool>()) {
