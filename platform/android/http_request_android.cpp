@@ -191,7 +191,7 @@ void HTTPAndroidRequest::finish() {
     delete this;
 }
 
-void HTTPAndroidRequest::onResponse(int code, std::string message, std::string etag, std::string modified, std::string cacheControl, std::string expires, std::string body) {
+void HTTPAndroidRequest::onResponse(int code, std::string, std::string etag, std::string modified, std::string cacheControl, std::string expires, std::string body) {
     response = std::make_unique<Response>();
     using Error = Response::Error;
 
@@ -250,7 +250,7 @@ void HTTPAndroidRequest::onFailure(int type, std::string message) {
     async.send();
 }
 
-std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t*) {
     return std::make_unique<HTTPAndroidContext>();
 }
 
