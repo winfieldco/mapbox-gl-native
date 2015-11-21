@@ -79,6 +79,10 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     [self.mapView addGestureRecognizer:[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)]];
 
     [self restoreState:nil];
+
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(45.468780541878154, -122.65276581137326)
+                            zoomLevel:15
+                             animated:YES];
 }
 
 - (void)saveState:(__unused NSNotification *)notification
