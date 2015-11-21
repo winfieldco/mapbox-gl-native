@@ -74,7 +74,7 @@ TileID FrontlineFileSource::Impl::tileIDForResource(const Resource& res) {
 
 bool FrontlineFileSource::Impl::handlesResource(const Resource& res) {
     try {
-        if (res.kind == Resource::Kind::Tile && res.url.find(".png") != std::string::npos) {
+        if (res.kind == Resource::Kind::Tile) {
             if (!db) {
                 openDatabase();
             }
@@ -89,6 +89,8 @@ bool FrontlineFileSource::Impl::handlesResource(const Resource& res) {
             if (getStmt.run() && getStmt.get<int>(0) > 0) {
                 return true;
             }
+        } else if (res.kind != Resource::Kind::Unknown) {
+            return true;
         }
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
@@ -107,17 +109,44 @@ void FrontlineFileSource::Impl::handleRequest(Request* req) {
     std::shared_ptr<Response> res = std::make_shared<Response>();
 
     try {
-        Statement getStmt = db->prepare("SELECT `tile_data` FROM `tiles` WHERE `zoom_level` = ? AND `tile_column` = ? AND `tile_row` = ?");
+        if (req->resource.kind == Resource::Kind::Tile) {
+            Statement getStmt = db->prepare("SELECT `tile_data` FROM `tiles` WHERE `zoom_level` = ? AND `tile_column` = ? AND `tile_row` = ?");
 
-        TileID id = tileIDForResource(req->resource);
-        getStmt.bind(1, (int)id.z);
-        getStmt.bind(2, (int)id.x);
-        getStmt.bind(3, (int)id.y);
+            TileID id = tileIDForResource(req->resource);
+            getStmt.bind(1, (int)id.z);
+            getStmt.bind(2, (int)id.x);
+            getStmt.bind(3, (int)id.y);
 
-        if (getStmt.run()) {
-            res->data = std::make_shared<std::string>(std::move(getStmt.get<std::string>(0)));
+            if (getStmt.run()) {
+                res->data = std::make_shared<std::string>(std::move(getStmt.get<std::string>(0)));
+            } else {
+                res->error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+            }
         } else {
-            res->error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+            std::string key = "";
+            if (req->resource.kind == Resource::Kind::Glyphs) {
+                key = "gl_glyph";
+            } else if (req->resource.kind == Resource::Kind::Source) {
+                key = "gl_source";
+            } else if (req->resource.kind == Resource::Kind::SpriteImage) {
+                key = "gl_sprite_image";
+            } else if (req->resource.kind == Resource::Kind::SpriteJSON) {
+                key = "gl_sprite_metadata";
+            } else if (req->resource.kind == Resource::Kind::Style) {
+                key = "gl_style";
+            }
+            assert(key.length());
+
+            Statement getStmt = db->prepare("SELECT `value` FROM `metadata` WHERE `name` = ?");
+
+            const auto name = key + "_" + util::mapbox::canonicalURL(req->resource.url);
+            getStmt.bind(1, name.c_str());
+
+            if (getStmt.run()) {
+                res->data = std::make_shared<std::string>(std::move(getStmt.get<std::string>(0)));
+            } else {
+                res->error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+            }
         }
     } catch (const std::exception& err) {
         res->error = std::make_unique<Response::Error>(Response::Error::Reason::Other, err.what());
@@ -145,21 +174,30 @@ Request* FrontlineFileSource::request(const Resource& resource, uv_loop_t* l, Ca
     std::string url;
 
     switch (resource.kind) {
-        case Resource::Kind::Tile:
-            url = resource.url;
+        case Resource::Kind::Style:
+            url = mbgl::util::mapbox::normalizeStyleURL(resource.url, "foo");
             break;
 
+        case Resource::Kind::Source:
+            url = util::mapbox::normalizeSourceURL(resource.url, "foo");
+            break;
+
+        case Resource::Kind::Glyphs:
+            url = util::mapbox::normalizeGlyphsURL(resource.url, "foo");
+            break;
+
+        case Resource::Kind::SpriteImage:
+        case Resource::Kind::SpriteJSON:
+            url = util::mapbox::normalizeSpriteURL(resource.url, "foo");
+            break;
+            
         default:
-            url = "";
+            url = resource.url;
     }
 
-    if (url.length()) {
-        auto req = new Request({ resource.kind, url }, l, std::move(callback));
-        thread->invoke(&Impl::handleRequest, req);
-        return req;
-    } else {
-        return nullptr;
-    }
+    auto req = new Request({ resource.kind, url }, l, std::move(callback));
+    thread->invoke(&Impl::handleRequest, req);
+    return req;
 }
 
 void FrontlineFileSource::cancel(Request* req) {
