@@ -399,6 +399,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     _glView.drawableStencilFormat = GLKViewDrawableStencilFormat8;
     _glView.drawableDepthFormat = GLKViewDrawableDepthFormat16;
     _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    _glView.layer.opaque = NO;
     _glView.delegate = self;
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
