@@ -84,7 +84,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A {@code MapView} provides an embeddable map interface, similar to the one provided by the Google Maps API.
+ * A {@code MapView} provides an embeddable map interface.
  * You use this class to display map information and to manipulate the map contents from your application.
  * You can center the map on a given coordinate, specify the size of the area you want to display,
  * and style the features of the map to fit your application's use case.
