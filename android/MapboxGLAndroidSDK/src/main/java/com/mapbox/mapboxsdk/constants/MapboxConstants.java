@@ -2,6 +2,9 @@ package com.mapbox.mapboxsdk.constants;
 
 import java.util.Locale;
 
+/**
+ * MapboxConstants exposes Mapbox related constants
+ */
 public class MapboxConstants {
 
     /**
