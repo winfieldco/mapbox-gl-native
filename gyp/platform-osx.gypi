@@ -16,34 +16,55 @@
         '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
         '../platform/darwin/nsthread.mm',
+        '../platform/darwin/reachability.m',
+        '../platform/darwin/NSException+MGLAdditions.h',
+        '../platform/darwin/NSString+MGLAdditions.h',
+        '../platform/darwin/NSString+MGLAdditions.m',
+        '../include/mbgl/osx/MGLAccountManager.h',
+        '../platform/osx/MGLAccountManager_Private.h',
+        '../platform/osx/MGLAccountManager.m',
+        '../include/mbgl/osx/MGLMapView.h',
+        '../platform/osx/MGLMapView.mm',
+        '../include/mbgl/osx/MGLTypes.h',
+        '../platform/osx/MGLTypes.m',
+        '../include/mbgl/osx/MGLStyle.h',
+        '../platform/osx/MGLStyle.mm',
       ],
 
       'variables': {
         'cflags_cc': [
           '<@(libuv_cflags)',
           '<@(boost_cflags)',
+          '<@(variant_cflags)',
         ],
         'libraries': [
           '<@(libuv_static_libs)',
         ],
         'ldflags': [
+          '-framework Cocoa',
+          '-framework CoreFoundation',
+          '-framework CoreLocation',
+          '-framework CoreVideo',
+          '-framework GLKit',
           '-framework Foundation',
           '-framework ImageIO',
           '-framework CoreServices',
           '-framework OpenGL',
           '-framework ApplicationServices',
+          '-framework SystemConfiguration',
         ],
       },
 
       'include_dirs': [
         '../include',
-        '../src',
+#        '../src',
       ],
 
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
+        'USER_HEADER_SEARCH_PATHS': '../include/mbgl/osx',
       },
 
       'link_settings': {

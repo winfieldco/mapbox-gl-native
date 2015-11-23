@@ -9,7 +9,9 @@
       'product_extension': 'app',
       'mac_bundle': 1,
       'mac_bundle_resources': [
-        'Icon.icns'
+        'Icon.icns',
+        'Info.plist',
+        'MainMenu.xib',
       ],
 
       'dependencies': [
@@ -21,42 +23,30 @@
       ],
 
       'sources': [
-        './main.mm',
-        '../platform/darwin/settings_nsuserdefaults.hpp',
-        '../platform/darwin/settings_nsuserdefaults.mm',
-        '../platform/darwin/reachability.m',
-        '../platform/default/glfw_view.hpp',
-        '../platform/default/glfw_view.cpp',
+        './AppDelegate.h',
+        './AppDelegate.m',
+        './main.m',
+#        '../platform/darwin/reachability.m',
       ],
 
       'variables' : {
-        'cflags_cc': [
-          '<@(boost_cflags)',
-          '<@(glfw_cflags)',
-          '<@(variant_cflags)',
-        ],
         'ldflags': [
-          '-framework SystemConfiguration', # For NSUserDefaults and Reachability
-          '<@(glfw_ldflags)',
-        ],
-        'libraries': [
-          '<@(glfw_static_libs)',
-          '<@(boost_libprogram_options_static_libs)'
+#          '-framework SystemConfiguration', # For NSUserDefaults and Reachability
         ],
       },
 
       'libraries': [
-        '<@(libraries)',
+#        '<@(libraries)',
       ],
 
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
-        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-        'OTHER_LDFLAGS': [ '<@(ldflags)' ],
-        'SDKROOT': 'macosx',
+#        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
+        'OTHER_LDFLAGS': [ '<@(ldflags)', '-stdlib=libc++', '-lstdc++' ],
         'INFOPLIST_FILE': '../macosx/Info.plist',
-        'CLANG_ENABLE_OBJC_ARC': 'YES'
+        'CLANG_ENABLE_OBJC_ARC': 'YES',
+        'USER_HEADER_SEARCH_PATHS': '../include/mbgl/osx',
       },
     }
   ]

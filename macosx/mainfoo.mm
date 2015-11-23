@@ -113,7 +113,7 @@ const std::string &defaultCacheDatabase() {
     return path;
 }
 
-int main(int argc, char* argv[]) {
+int mainfoo(int argc, char* argv[]) {
     bool fullscreen = false;
     bool benchmark = false;
     std::string style;
