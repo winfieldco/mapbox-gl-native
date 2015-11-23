@@ -79,11 +79,26 @@
 }
 
 - (IBAction)zoomIn:(id)sender {
-    self.mapView.zoomLevel++;
+    [self.mapView setZoomLevel:self.mapView.zoomLevel + 1 animated:YES];
 }
 
 - (IBAction)zoomOut:(id)sender {
-    self.mapView.zoomLevel--;
+    [self.mapView setZoomLevel:self.mapView.zoomLevel - 1 animated:YES];
+}
+
+- (IBAction)toggleTileEdges:(id)sender {
+    self.mapView.showsTileEdges = !self.mapView.showsTileEdges;
+}
+
+- (IBAction)toggleCollisionBoxes:(id)sender {
+    self.mapView.showsCollisionBoxes = !self.mapView.showsCollisionBoxes;
+}
+
+- (IBAction)giveFeedback:(id)sender {
+    CLLocationCoordinate2D centerCoordinate = self.mapView.centerCoordinate;
+    NSURL *feedbackURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%.0f",
+                                               centerCoordinate.longitude, centerCoordinate.latitude, round(self.mapView.zoomLevel)]];
+    [[NSWorkspace sharedWorkspace] openURL:feedbackURL];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
@@ -121,7 +136,18 @@
     if (menuItem.action == @selector(zoomOut:)) {
         return self.mapView.zoomLevel > self.mapView.minimumZoomLevel;
     }
-    return [super validateMenuItem:menuItem];
+    if (menuItem.action == @selector(toggleTileEdges:)) {
+        menuItem.title = self.mapView.showsTileEdges ? @"Hide Tile Edges" : @"Show Tile Edges";
+        return YES;
+    }
+    if (menuItem.action == @selector(toggleCollisionBoxes:)) {
+        menuItem.title = self.mapView.showsCollisionBoxes ? @"Hide Collision Boxes" : @"Show Collision Boxes";
+        return YES;
+    }
+    if (menuItem.action == @selector(giveFeedback:)) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

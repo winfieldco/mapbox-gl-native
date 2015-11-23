@@ -9,6 +9,7 @@
       'product_extension': 'app',
       'mac_bundle': 1,
       'mac_bundle_resources': [
+        'Credits.rtf',
         'Icon.icns',
         'Info.plist',
         'MainMenu.xib',
@@ -26,23 +27,11 @@
         './AppDelegate.h',
         './AppDelegate.m',
         './main.m',
-#        '../platform/darwin/reachability.m',
-      ],
-
-      'variables' : {
-        'ldflags': [
-#          '-framework SystemConfiguration', # For NSUserDefaults and Reachability
-        ],
-      },
-
-      'libraries': [
-#        '<@(libraries)',
       ],
 
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
-#        'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'OTHER_LDFLAGS': [ '<@(ldflags)', '-stdlib=libc++', '-lstdc++' ],
         'INFOPLIST_FILE': '../macosx/Info.plist',
         'CLANG_ENABLE_OBJC_ARC': 'YES',

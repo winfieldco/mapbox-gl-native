@@ -17,7 +17,6 @@
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
-        <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
                 <menuItem title="Mapbox GL" id="1Xt-HY-uBw">
@@ -392,6 +391,19 @@
                                     <action selector="zoomOut:" target="-1" id="0pP-tO-9ex"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="mkP-YN-G0w"/>
+                            <menuItem title="Show Tile Edges" id="rDE-dG-rTR">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleTileEdges:" target="Voe-Tx-rLC" id="EoM-i7-ODu"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show Collision Boxes" id="Y0b-3K-mJE">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleCollisionBoxes:" target="Voe-Tx-rLC" id="iny-xQ-TxG"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="CyM-Wv-Bnc"/>
                             <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
@@ -442,12 +454,19 @@
                                     <action selector="showHelp:" target="-1" id="y7X-2Q-9no"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="EpY-wQ-SjH"/>
+                            <menuItem title="Improve This Map" id="xu5-WN-qYK">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="giveFeedback:" target="Voe-Tx-rLC" id="cr9-kp-ysL"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
             </items>
         </menu>
-        <window title="Mapbox GL" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+        <window title="Mapbox GL" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="Mapbox" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="480" height="360"/>

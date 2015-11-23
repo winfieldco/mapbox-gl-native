@@ -17,6 +17,12 @@
 
 class MBGLView;
 
+const NSTimeInterval MGLAnimationDuration = 0.3;
+
+std::chrono::steady_clock::duration MGLDurationInSeconds(float duration) {
+    return std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<float, std::chrono::seconds::period>(duration));
+}
+
 mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
     return mbgl::LatLng(coordinate.latitude, coordinate.longitude);
 }
@@ -102,6 +108,10 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng) {
         mbgl::NetworkStatus::Reachable();
     };
     [reachability startNotifier];
+    
+    self.acceptsTouchEvents = YES;
+    _scrollEnabled = YES;
+    _zoomEnabled = YES;
     
     mbgl::CameraOptions options;
     options.center = mbgl::LatLng(0, 0);
@@ -236,7 +246,11 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng) {
 }
 
 - (void)setZoomLevel:(double)zoomLevel {
-    _mbglMap->setZoom(zoomLevel);
+    [self setZoomLevel:zoomLevel animated:NO];
+}
+
+- (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated {
+    _mbglMap->setZoom(zoomLevel, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
 }
 
 - (double)maximumZoomLevel {
@@ -253,6 +267,73 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng) {
 
 - (void)setDirection:(CLLocationDirection)direction {
     _mbglMap->setBearing(direction);
+}
+
+- (BOOL)acceptsFirstResponder {
+    return YES;
+}
+
+- (BOOL)acceptsTouchEvents {
+    return YES;
+}
+
+- (void)mouseDragged:(NSEvent *)event {
+    if (!self.scrollEnabled) {
+        return;
+    }
+    
+    [[NSCursor closedHandCursor] set];
+    
+    CGFloat x = event.deltaX;
+    CGFloat y = event.deltaY;
+    if (x || y) {
+        _mbglMap->cancelTransitions();
+        _mbglMap->moveBy({ x, y });
+    }
+}
+
+- (void)mouseUp:(__unused NSEvent *)event {
+    [[NSCursor arrowCursor] set];
+    
+    if (self.zoomEnabled && event.clickCount % 2 == 0) {
+        CGPoint zoomInPoint = [self convertPoint:event.locationInWindow toView:nil];
+        mbgl::PrecisionPoint center(zoomInPoint.x, self.bounds.size.height - zoomInPoint.y);
+        _mbglMap->scaleBy(2, center, MGLDurationInSeconds(MGLAnimationDuration));
+    }
+}
+
+- (BOOL)wantsScrollEventsForSwipeTrackingOnAxis:(__unused NSEventGestureAxis)axis {
+    return YES;
+}
+
+- (void)scrollWheel:(NSEvent *)event {
+    // https://developer.apple.com/library/mac/releasenotes/AppKit/RN-AppKitOlderNotes/#10_7Dragging
+    if (!self.scrollEnabled || event.phase == NSEventPhaseNone) {
+        return;
+    }
+    
+    CGFloat x = event.scrollingDeltaX;
+    CGFloat y = event.scrollingDeltaY;
+    if (x || y) {
+        _mbglMap->cancelTransitions();
+        _mbglMap->moveBy({ x, y });
+    }
+}
+
+- (BOOL)showsTileEdges {
+    return _mbglMap->getDebug();
+}
+
+- (void)setShowsTileEdges:(BOOL)showsTileEdges {
+    _mbglMap->setDebug(showsTileEdges);
+}
+
+- (BOOL)showsCollisionBoxes {
+    return _mbglMap->getCollisionDebug();
+}
+
+- (void)setShowsCollisionBoxes:(BOOL)showsCollisionBoxes {
+    _mbglMap->setCollisionDebug(showsCollisionBoxes);
 }
 
 class MBGLView : public mbgl::View {
