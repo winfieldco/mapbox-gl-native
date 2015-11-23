@@ -352,32 +352,32 @@
                         <items>
                             <menuItem title="Streets" state="on" tag="1" keyEquivalent="1" id="17N-yz-NNo">
                                 <connections>
-                                    <action selector="setStyle:" target="Voe-Tx-rLC" id="z2i-ZM-5wT"/>
+                                    <action selector="setStyle:" target="-1" id="I4L-Wx-UXA"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Emerald" tag="2" keyEquivalent="2" id="BBa-Qa-SQr">
                                 <connections>
-                                    <action selector="setStyle:" target="Voe-Tx-rLC" id="PYt-8m-8yw"/>
+                                    <action selector="setStyle:" target="-1" id="rM1-yG-t5u"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Light" tag="3" keyEquivalent="3" id="HWe-7u-UVJ">
                                 <connections>
-                                    <action selector="setStyle:" target="Voe-Tx-rLC" id="AtW-oO-kfx"/>
+                                    <action selector="setStyle:" target="-1" id="Q9V-O1-oRz"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Dark" tag="4" keyEquivalent="4" id="6HI-q6-AeV">
                                 <connections>
-                                    <action selector="setStyle:" target="Voe-Tx-rLC" id="O29-Zx-9u0"/>
+                                    <action selector="setStyle:" target="-1" id="YfH-1I-G50"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Satellite" tag="5" keyEquivalent="5" id="h0J-5X-kgF">
                                 <connections>
-                                    <action selector="setStyle:" target="Voe-Tx-rLC" id="BUh-w1-arG"/>
+                                    <action selector="setStyle:" target="-1" id="GXt-oK-Hy1"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Hybrid" tag="6" keyEquivalent="6" id="9BL-00-HFt">
                                 <connections>
-                                    <action selector="setStyle:" target="Voe-Tx-rLC" id="8Sl-il-2o2"/>
+                                    <action selector="setStyle:" target="-1" id="oL4-AC-waq"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="BMF-ml-0Bd"/>
@@ -391,17 +391,22 @@
                                     <action selector="zoomOut:" target="-1" id="0pP-tO-9ex"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Snap to North" keyEquivalent="" id="Zss-3w-wkz">
+                                <connections>
+                                    <action selector="snapToNorth:" target="Voe-Tx-rLC" id="tDZ-9a-mdP"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="mkP-YN-G0w"/>
                             <menuItem title="Show Tile Edges" id="rDE-dG-rTR">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="toggleTileEdges:" target="Voe-Tx-rLC" id="EoM-i7-ODu"/>
+                                    <action selector="toggleTileEdges:" target="-1" id="J5b-Ph-O4S"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Show Collision Boxes" id="Y0b-3K-mJE">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="toggleCollisionBoxes:" target="Voe-Tx-rLC" id="iny-xQ-TxG"/>
+                                    <action selector="toggleCollisionBoxes:" target="-1" id="EYa-7n-iWZ"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="CyM-Wv-Bnc"/>
@@ -451,14 +456,14 @@
                         <items>
                             <menuItem title="Mapbox GL Help" keyEquivalent="?" id="FKE-Sm-Kum">
                                 <connections>
-                                    <action selector="showHelp:" target="-1" id="y7X-2Q-9no"/>
+                                    <action selector="showShortcuts:" target="-1" id="hNZ-sm-X2q"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="EpY-wQ-SjH"/>
                             <menuItem title="Improve This Map" id="xu5-WN-qYK">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="giveFeedback:" target="Voe-Tx-rLC" id="cr9-kp-ysL"/>
+                                    <action selector="giveFeedback:" target="-1" id="cil-i9-r39"/>
                                 </connections>
                             </menuItem>
                         </items>

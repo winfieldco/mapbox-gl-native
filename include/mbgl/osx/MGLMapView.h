@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) CLLocationCoordinate2D centerCoordinate;
 
+- (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated;
+
 @property (nonatomic) double zoomLevel;
 @property (nonatomic, readonly) double maximumZoomLevel;
 @property (nonatomic, readonly) double minimumZoomLevel;
@@ -19,8 +21,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) CLLocationDirection direction;
 
+- (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated;
+
 @property (nonatomic, getter=isScrollEnabled) BOOL scrollEnabled;
 @property (nonatomic, getter=isZoomEnabled) BOOL zoomEnabled;
+@property (nonatomic, getter=isRotateEnabled) BOOL rotateEnabled;
+@property (nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
 
 @property (nonatomic) BOOL showsTileEdges;
 @property (nonatomic) BOOL showsCollisionBoxes;

@@ -35,7 +35,14 @@
             accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"];
         }
         if (!accessToken) {
-            [NSAlert alertWithMessageText:@"Access token required" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"To load Mapbox-hosted tiles and styles, set the MAPBOX_ACCESS_TOKEN environment variable."];
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = @"Access token required";
+            alert.informativeText = @"To load Mapbox-hosted tiles and styles, set the MAPBOX_ACCESS_TOKEN environment variable.";
+            [alert addButtonWithTitle:@"OK"];
+            [alert addButtonWithTitle:@"Open Studio"];
+            if ([alert runModal] == NSAlertSecondButtonReturn) {
+                [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://www.mapbox.com/studio/account/tokens/"]];
+            }
         }
         
         [MGLAccountManager setAccessToken:accessToken];
@@ -87,12 +94,28 @@
     [self.mapView setZoomLevel:self.mapView.zoomLevel - 1 animated:YES];
 }
 
+- (IBAction)snapToNorth:(id)sender {
+    [self.mapView setDirection:0 animated:YES];
+}
+
 - (IBAction)toggleTileEdges:(id)sender {
     self.mapView.showsTileEdges = !self.mapView.showsTileEdges;
 }
 
 - (IBAction)toggleCollisionBoxes:(id)sender {
     self.mapView.showsCollisionBoxes = !self.mapView.showsCollisionBoxes;
+}
+
+- (IBAction)showShortcuts:(id)sender {
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = @"Mapbox GL Help";
+    alert.informativeText = @"\
+• To scroll, swipe with two fingers, drag the cursor, or press the arrow keys.\n\
+• To zoom, pinch with two fingers, or hold down Shift while dragging the cursor up and down.\n\
+• To rotate, move two fingers opposite each other in a circle, or hold down Option while dragging the cursor left and right.\n\
+• To tilt, hold down Option while dragging the cursor up and down.\
+";
+    [alert runModal];
 }
 
 - (IBAction)giveFeedback:(id)sender {
@@ -137,12 +160,18 @@
     if (menuItem.action == @selector(zoomOut:)) {
         return self.mapView.zoomLevel > self.mapView.minimumZoomLevel;
     }
+    if (menuItem.action == @selector(snapToNorth:)) {
+        return self.mapView.direction != 0;
+    }
     if (menuItem.action == @selector(toggleTileEdges:)) {
         menuItem.title = self.mapView.showsTileEdges ? @"Hide Tile Edges" : @"Show Tile Edges";
         return YES;
     }
     if (menuItem.action == @selector(toggleCollisionBoxes:)) {
         menuItem.title = self.mapView.showsCollisionBoxes ? @"Hide Collision Boxes" : @"Show Collision Boxes";
+        return YES;
+    }
+    if (menuItem.action == @selector(showShortcuts:)) {
         return YES;
     }
     if (menuItem.action == @selector(giveFeedback:)) {
