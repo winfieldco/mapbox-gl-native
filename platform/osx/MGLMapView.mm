@@ -295,7 +295,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng) {
 - (void)mouseUp:(__unused NSEvent *)event {
     [[NSCursor arrowCursor] set];
     
-    if (self.zoomEnabled && event.clickCount % 2 == 0) {
+    if (self.zoomEnabled && event.clickCount && event.clickCount % 2 == 0) {
         CGPoint zoomInPoint = [self convertPoint:event.locationInWindow toView:nil];
         mbgl::PrecisionPoint center(zoomInPoint.x, self.bounds.size.height - zoomInPoint.y);
         _mbglMap->scaleBy(2, center, MGLDurationInSeconds(MGLAnimationDuration));

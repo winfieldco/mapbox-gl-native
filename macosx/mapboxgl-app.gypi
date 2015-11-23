@@ -32,7 +32,7 @@
       'xcode_settings': {
         'SDKROOT': 'macosx',
         'SUPPORTED_PLATFORMS':'macosx',
-        'OTHER_LDFLAGS': [ '<@(ldflags)', '-stdlib=libc++', '-lstdc++' ],
+        'OTHER_LDFLAGS': [ '-stdlib=libc++', '-lstdc++' ],
         'INFOPLIST_FILE': '../macosx/Info.plist',
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'USER_HEADER_SEARCH_PATHS': '../include/mbgl/osx',

@@ -44,6 +44,7 @@
     self.mapView = [[MGLMapView alloc] initWithFrame:self.window.contentView.bounds];
     self.mapView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self.window.contentView addSubview:self.mapView];
+    [self.window makeFirstResponder:self.mapView];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
