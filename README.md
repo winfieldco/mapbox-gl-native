@@ -27,3 +27,45 @@ If you want to use products _based on_ Mapbox GL, check out:
 * Android 4.0.3+ (API level 15+)
 
 See [`INSTALL.md`](./INSTALL.md) for development setup and install instructions, including dependencies.
+
+
+# Parts integration
+
+Instructions below outline how to install, edit source, and deploy the changes. This allows for an edited version of the mapbox gl.
+
+## Installation
+
+To replace the version of mapbox GL being used, first clone the repo:
+
+    git clone https://github.com/winfieldco/mapbox-gl-native
+    
+In the repo dir start the project:
+
+    make iproj
+    
+If the project already exists, you can open this xcode project instead to save time:
+
+    mapbox-gl-native/build/ios-all/gyp
+    
+You may now change the source code and view your changes in the sample project. All testing and changes should be done within this sample project, as building for inclusion in other projects is extremely slow >5 mins per build.
+
+## Deployment
+
+When you are ready to deploy go to the repo directory and build the static libs, note this takes a while:
+
+    make ipackage    
+    
+In your project's settings.py add the path to your checkout:
+
+    MAPBOX_GL_NATIVE_DIR = '~/Work/sandbox/native/fork/mapbox-gl-native		
+## Roadmap
+
+Make it so it can build directly from source to speed up seeing changes. This will be crucial later in development.
+
+## Troubleshooting
+
+### Linking issues
+
+Do not try to link in the framework version, it has this wierd podfile error... target has transitive dependencies that include static binaries, and will never build. Even if you run directly from cocoapods for 3.0.1, it's plain broken.
+
+That is why the the podspec uses the vendored lib etc.

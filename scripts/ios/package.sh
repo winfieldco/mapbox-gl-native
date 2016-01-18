@@ -77,6 +77,11 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
     -target everything \
     -jobs ${JOBS}
 
+step "Setting up dummy source file for CocoaPods 0.37.0..."
+echo "// https://github.com/mapbox/mapbox-gl-native/issues/1426" > "${OUTPUT}/static/MGLDummy.m"
+
+# Copy in the podspec
+cat "./ios/static_Mapbox-iOS-SDK.podspec.json" > "${OUTPUT}/static/Mapbox-iOS-SDK.podspec.json"
 
 step "Building static library..."
 LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
