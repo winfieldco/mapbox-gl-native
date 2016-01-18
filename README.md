@@ -33,6 +33,10 @@ See [`INSTALL.md`](./INSTALL.md) for development setup and install instructions,
 
 Instructions below outline how to install, edit source, and deploy the changes. This allows for an edited version of the mapbox gl.
 
+## Version
+
+- Pegged to ios-v3.0.1 (8fb141a)
+
 ## Installation
 
 To replace the version of mapbox GL being used, first clone the repo:
