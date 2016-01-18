@@ -64,6 +64,10 @@ Make it so it can build directly from source to speed up seeing changes. This wi
 
 ## Troubleshooting
 
+### Make fails on missing source files
+
+Run make dist-clean to clear out the cache of build files.
+
 ### Linking issues
 
 Do not try to link in the framework version, it has this wierd podfile error... target has transitive dependencies that include static binaries, and will never build. Even if you run directly from cocoapods for 3.0.1, it's plain broken.
