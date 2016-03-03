@@ -66,6 +66,9 @@ public:
     bool isRotating() const { return state.isRotating(); }
     bool isScaling() const { return state.isScaling(); }
     bool isPanning() const { return state.isPanning(); }
+  
+    // Bounds
+    void setBounds(LatLngBounds bounds) { state.bounds = bounds; }
 
 private:
     void _moveBy(const PrecisionPoint&, const Duration& = Duration::zero());

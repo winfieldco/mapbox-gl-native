@@ -120,6 +120,9 @@ public:
     double getMaxZoom() const;
     void setMaxZoom(double zoom);
     void setMinZoom(double zoom);
+  
+    // Bounds
+    void setBounds(LatLngBounds bounds);
 
     // Rotation
     void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());

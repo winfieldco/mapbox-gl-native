@@ -1673,6 +1673,11 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     _mbglMap->setMinZoom(zoomLevel);
 }
 
+- (void)setBoundsWithSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast
+{
+    _mbglMap->setBounds(mbgl::LatLngBounds(mbgl::LatLng(southWest.latitude, southWest.longitude), mbgl::LatLng(northEast.latitude, northEast.longitude)));
+}
+
 MGLCoordinateBounds MGLCoordinateBoundsFromLatLngBounds(mbgl::LatLngBounds latLngBounds)
 {
     return MGLCoordinateBoundsMake(MGLLocationCoordinate2DFromLatLng(latLngBounds.sw),

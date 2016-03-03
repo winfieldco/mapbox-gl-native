@@ -49,6 +49,7 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
         state.width = size[0];
         state.height = size[1];
         state.constrain(state.scale, state.y);
+        state.constrainByBounds(state.scale, state.x, state.y);
 
         view.notifyMapChange(MapChangeRegionDidChange);
 
@@ -106,6 +107,7 @@ void Transform::_moveBy(const PrecisionPoint& point, const Duration& duration) {
     double y = state.y + std::cos(state.angle) * point.y + std::sin(-state.angle) * point.x;
 
     state.constrain(state.scale, y);
+    state.constrainByBounds(state.scale, x, y);
 
     CameraOptions options;
     options.duration = duration;
@@ -258,6 +260,7 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
     double y = yn;
 
     state.constrain(scale, y);
+    state.constrainByBounds(scale, x, y);
     
     double angle = _normalizeAngle(new_angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);

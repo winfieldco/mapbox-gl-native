@@ -34,6 +34,9 @@ public:
     std::array<float, 2> locationCoordinate(float lon, float lat) const;
     void getLonLat(double &lon, double &lat) const;
 
+    // Bounds
+    LatLngBounds bounds = LatLngBounds(LatLng(-90, -180), LatLng(90, 180));
+
     // Position
     LatLng getLatLng() const;
     double pixel_x() const;
@@ -73,9 +76,12 @@ public:
 
     PrecisionPoint coordinateToPoint(const TileCoordinate&) const;
     TileCoordinate pointToCoordinate(const PrecisionPoint&) const;
+  
+    PrecisionPoint latLngToXY(LatLng latLng) const;
 
 private:
     void constrain(double& scale, double& y) const;
+    void constrainByBounds(double& scale_, double& x_, double& y_) const;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);

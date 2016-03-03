@@ -218,6 +218,10 @@ double Map::getZoom() const {
     return transform->getZoom();
 }
 
+void Map::setBounds(LatLngBounds bounds) {
+    transform->setBounds(bounds);
+}
+
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
     transform->setLatLngZoom(latLng, zoom, duration);
     update(Update::Zoom);
