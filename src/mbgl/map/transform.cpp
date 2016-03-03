@@ -199,6 +199,24 @@ double Transform::getScale() const {
     return state.scale;
 }
 
+void Transform::setMaxZoom(double zoom) {
+    state.setMaxZoom(zoom);
+  
+    // If beyond the max scale, immediately switch to the max
+    if(state.getScale() > state.getMaxScale()) {
+      this->setScale(state.getMaxScale());
+    }
+}
+
+void Transform::setMinZoom(double zoom) {
+    state.setMinZoom(zoom);
+
+    // If beyond the max scale, immediately switch to the min
+    if(state.getScale() < state.getMinScale()) {
+      this->setScale(state.getMinScale());
+    }
+}
+
 void Transform::_setScale(double new_scale, const PrecisionPoint& center, const Duration& duration) {
     // Ensure that we don't zoom in further than the maximum allowed.
     if (new_scale < state.min_scale) {

@@ -121,6 +121,12 @@ IB_DESIGNABLE
 *   Changing the zoom level scales the map without changing the current center coordinate. At zoom level 0, tiles cover the entire world map; at zoom level 1, tiles cover 1/4 of the world; at zoom level 2, tiles cover 1/16 of the world, and so on. */
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
+/** Changes the maximum zoom level */
+- (void)setMaxZoomLevel:(double)zoomLevel;
+
+/** Changes the minimum zoom level */
+- (void)setMinZoomLevel:(double)zoomLevel;
+
 /** Changes the center coordinate and zoom level of the map and optionally animates the change. 
 *   @param centerCoordinate The new center coordinate for the map.
 *   @param zoomLevel The new zoom level for the map.

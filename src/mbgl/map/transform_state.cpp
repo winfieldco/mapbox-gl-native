@@ -137,6 +137,14 @@ double TransformState::getScale() const {
     return scale;
 }
 
+double TransformState::getMaxScale() const {
+    return max_scale;
+}
+
+double TransformState::getMinScale() const {
+    return min_scale;
+}
+
 double TransformState::getMinZoom() const {
     double test_scale = scale;
     double test_y = y;
@@ -149,6 +157,13 @@ double TransformState::getMaxZoom() const {
     return ::log2(max_scale);
 }
 
+void TransformState::setMaxZoom(double zoom) {
+    max_scale = this->zoomScale(zoom);
+}
+
+void TransformState::setMinZoom(double zoom) {
+    min_scale = this->zoomScale(zoom);
+}
 
 #pragma mark - Rotation
 
@@ -308,7 +323,6 @@ mat4 TransformState::getPixelMatrix() const {
     matrix::translate(m, m, 1, -1, 0);
     return m;
 }
-
 
 #pragma mark - (private helper functions)
 

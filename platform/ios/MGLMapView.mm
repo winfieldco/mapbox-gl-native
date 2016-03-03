@@ -197,6 +197,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     }
 
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
+
 }
 
 - (void)commonInit
@@ -216,7 +217,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     // setup mbgl view
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglView = new MBGLView(self, scaleFactor);
-
+  
     // setup mbgl cache & file source
     NSString *fileCachePath = @"";
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -1662,6 +1663,14 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
     [self setCenterCoordinate:self.centerCoordinate zoomLevel:zoomLevel animated:animated];
+}
+
+- (void)setMaxZoomLevel:(double)zoomLevel {
+    _mbglMap->setMaxZoom(zoomLevel);
+}
+
+- (void)setMinZoomLevel:(double)zoomLevel {
+    _mbglMap->setMinZoom(zoomLevel);
 }
 
 MGLCoordinateBounds MGLCoordinateBoundsFromLatLngBounds(mbgl::LatLngBounds latLngBounds)

@@ -39,6 +39,8 @@ public:
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
     double getScale() const;
+    void setMaxZoom(double zoom);
+    void setMinZoom(double zoom);
 
     // Angle
     void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());

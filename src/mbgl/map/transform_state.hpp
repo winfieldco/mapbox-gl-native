@@ -47,7 +47,11 @@ public:
     double getScale() const;
     double getMinZoom() const;
     double getMaxZoom() const;
-
+    void setMinZoom(double zoom);
+    void setMaxZoom(double zoom);
+    double getMaxScale() const;
+    double getMinScale() const;
+  
     // Rotation
     float getAngle() const;
     float getAltitude() const;
@@ -59,7 +63,7 @@ public:
     bool isScaling() const;
     bool isPanning() const;
     bool isGestureInProgress() const;
-
+  
     // Conversion and projection
     PrecisionPoint latLngToPoint(const LatLng&) const;
     LatLng pointToLatLng(const PrecisionPoint&) const;

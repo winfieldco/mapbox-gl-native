@@ -201,6 +201,14 @@ double Map::getScale() const {
     return transform->getScale();
 }
 
+void Map::setMaxZoom(double zoom) {
+    transform->setMaxZoom(zoom);
+}
+
+void Map::setMinZoom(double zoom) {
+    transform->setMinZoom(zoom);
+}
+
 void Map::setZoom(double zoom, const Duration& duration) {
     transform->setZoom(zoom, duration);
     update(Update::Zoom);
