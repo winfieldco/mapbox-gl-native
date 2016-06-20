@@ -20,6 +20,9 @@
     "Headers/*.h",
     "MGLDummy.m"
   ],
+  "source": {
+    ":path": "."
+  },  
   "resource_bundles": {
     "Mapbox": "Mapbox.bundle/*"
   },
