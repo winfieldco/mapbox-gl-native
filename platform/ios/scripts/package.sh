@@ -273,3 +273,6 @@ cp ${README} "${OUTPUT}"
 
 step "Generating API documentation…"
 make idocument OUTPUT="${OUTPUT}/documentation"
+
+# Copy in the podspec
+cat "./platform/ios/local-Mapbox-iOS-SDK.podspec" > "${OUTPUT}/Mapbox-iOS-SDK.podspec"
