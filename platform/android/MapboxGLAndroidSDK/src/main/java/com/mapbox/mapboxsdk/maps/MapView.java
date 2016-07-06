@@ -83,6 +83,10 @@ import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -761,7 +765,36 @@ public class MapView extends FrameLayout {
             return;
         }
         mStyleUrl = url;
-        mNativeMapView.setStyleUrl(url);
+
+        // Handle the local file storage URI, where we basically
+        // read the JSON style file and use the style JSON method instead,
+        // since we can't store in the assets directory and want the
+        // file served from the CMS.
+        if(url.startsWith("file://")) {
+
+            try {
+                File target = new File(url.replace("file://", ""));
+                FileInputStream fio = new FileInputStream(target);
+                InputStreamReader isr = new InputStreamReader(fio);
+                BufferedReader reader = new BufferedReader(isr);
+                StringBuilder sb = new StringBuilder();
+
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                reader.close();
+                mNativeMapView.setStyleJson(sb.toString());
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+
+        }
+        else {
+            mNativeMapView.setStyleUrl(url);
+        }
+
     }
 
     /**
