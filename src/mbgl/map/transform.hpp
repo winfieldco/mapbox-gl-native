@@ -143,6 +143,9 @@ public:
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
+  
+    // Bounds
+    void setBoundsConstraint(LatLng southwest, LatLng northeast) { state.boundsConstraintNortheast = northeast; state.boundsConstraintSouthwest = southwest; }
 
 private:
     View &view;

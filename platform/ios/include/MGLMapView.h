@@ -452,6 +452,11 @@ IB_DESIGNABLE
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
+/** The boundary constraint ensures the user cannot pan or zoom beyond a bounding box
+ * defined by the southwest and northeast.
+ */
+- (void)setBoundsConstraintWithSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast;
+
 /** The zoom level of the receiver.
  
  In addition to affecting the visual size and detail of features on the map,

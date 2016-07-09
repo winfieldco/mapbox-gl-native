@@ -1168,6 +1168,20 @@ jni::jobject* nativePixelForLatLng(JNIEnv *env, jni::jobject* obj, jlong nativeM
     return &jni::NewObject(*env, *pointFClass, *pointFConstructorId, static_cast<jfloat>(pixel.x), static_cast<jfloat>(pixel.y));
 }
 
+void nativeSetBoundsConstraint(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* southWest, jni::jobject* northEast) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetBoundsConstraint");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jdouble swlatitude = jni::GetField<jdouble>(*env, southWest, *latLngLatitudeId);
+    jdouble swlongitude = jni::GetField<jdouble>(*env, southWest, *latLngLongitudeId);
+  
+    jdouble nelatitude = jni::GetField<jdouble>(*env, northEast, *latLngLatitudeId);
+    jdouble nelongitude = jni::GetField<jdouble>(*env, northEast, *latLngLongitudeId);
+  
+    nativeMapView->getMap().setBoundsConstraint(mbgl::LatLng(swlatitude, swlongitude), mbgl::LatLng(nelatitude, nelongitude));
+}
+
 jni::jobject* nativeLatLngForPixel(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* pixel) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeLatLngForPixel");
     assert(nativeMapViewPtr != 0);
@@ -1897,6 +1911,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeLatLngForProjectedMeters, "(JLcom/mapbox/mapboxsdk/geometry/ProjectedMeters;)Lcom/mapbox/mapboxsdk/geometry/LatLng;"),
         MAKE_NATIVE_METHOD(nativePixelForLatLng, "(JLcom/mapbox/mapboxsdk/geometry/LatLng;)Landroid/graphics/PointF;"),
         MAKE_NATIVE_METHOD(nativeLatLngForPixel, "(JLandroid/graphics/PointF;)Lcom/mapbox/mapboxsdk/geometry/LatLng;"),
+        MAKE_NATIVE_METHOD(nativeSetBoundsConstraint, "(JLcom/mapbox/mapboxsdk/geometry/LatLng;Lcom/mapbox/mapboxsdk/geometry/LatLng;)V"),
         MAKE_NATIVE_METHOD(nativeGetTopOffsetPixelsForAnnotationSymbol, "(JLjava/lang/String;)D"),
         MAKE_NATIVE_METHOD(nativeJumpTo, "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;DD)V"),
         MAKE_NATIVE_METHOD(nativeEaseTo, "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;JDD)V"),

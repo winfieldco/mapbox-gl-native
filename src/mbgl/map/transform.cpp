@@ -98,11 +98,11 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     // Make sure the end coordinate always remains valid.
     latLng.wrap();
 
-    const ScreenCoordinate startPoint = {
+    ScreenCoordinate startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
     };
-    const ScreenCoordinate endPoint = {
+    ScreenCoordinate endPoint = {
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
@@ -111,8 +111,26 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-    const double scale = state.zoomScale(zoom);
+    double scale = state.zoomScale(zoom);
     pitch = util::clamp(pitch, 0., util::PITCH_MAX);
+  
+    double testX = state.lngX(latLng.longitude);
+    double testY = state.latY(latLng.latitude);
+    double testScale = state.zoomScale(zoom);
+  
+    // Constrain by bounds
+    state.constrainByBounds(testScale, testX, testY);
+    if(testX != endPoint.x || testY != endPoint.y || scale != testScale) {
+    
+        // Uncomment for testing
+        // Log::Info(Event::General, "Exceeded bounding constraints, limiting pan and zoom...");
+    
+        endPoint = {
+          testX,
+          testY
+        };
+        scale = testScale;
+    }
     
     Update update = state.getZoom() == zoom ? Update::Repaint : Update::Zoom;
     

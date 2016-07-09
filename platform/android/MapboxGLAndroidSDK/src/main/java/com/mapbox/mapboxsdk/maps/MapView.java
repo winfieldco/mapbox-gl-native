@@ -830,6 +830,10 @@ public class MapView extends FrameLayout {
         return mStyleUrl;
     }
 
+    public void setBoundsConstraint(LatLng southWest, LatLng northEast) {
+        mNativeMapView.setBoundsConstraint(southWest, northEast);
+    }
+
     //
     // Access token
     //

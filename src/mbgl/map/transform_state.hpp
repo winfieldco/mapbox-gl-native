@@ -71,6 +71,10 @@ public:
     double yLat(double y, double worldSize) const;
     double lngX(double lon) const;
     double latY(double lat) const;
+  
+    // Bounds (default to entire world)
+    LatLng boundsConstraintNortheast = LatLng(90, 180);
+    LatLng boundsConstraintSouthwest = LatLng(-90, -180);
 
 private:
     bool rotatedNorth() const;
@@ -117,6 +121,10 @@ private:
     // cache values for spherical mercator math
     double Bc = worldSize() / util::DEGREES_MAX;
     double Cc = worldSize() / util::M2PI;
+  
+    // Custom
+    void constrainByBounds(double& scale_, double& x_, double& y_) const;
+  
 };
 
 } // namespace mbgl

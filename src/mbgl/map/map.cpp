@@ -584,4 +584,10 @@ void Map::dumpDebugLogs() const {
     context->invokeSync(&MapContext::dumpDebugLogs);
 }
 
+#pragma mark - Bounds
+
+void Map::setBoundsConstraint(LatLng southwest, LatLng northeast) {
+    transform->setBoundsConstraint(southwest, northeast);
+}
+
 } // namespace mbgl

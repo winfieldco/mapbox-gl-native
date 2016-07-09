@@ -496,6 +496,10 @@ final class NativeMapView {
         return nativeGetCameraValues(mNativeMapViewPtr);
     }
 
+    public void setBoundsConstraint(LatLng southWest, LatLng northEast) {
+        nativeSetBoundsConstraint(mNativeMapViewPtr, southWest, northEast);
+    }
+
     //
     // Callbacks
     //
@@ -691,4 +695,6 @@ final class NativeMapView {
     private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
+
+    private native void nativeSetBoundsConstraint(long mNativeMapViewPtr, LatLng southWest, LatLng northEast);
 }

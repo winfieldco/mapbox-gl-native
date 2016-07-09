@@ -1854,6 +1854,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return _mbglMap->getMaxZoom();
 }
 
+- (void)setBoundsConstraintWithSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast
+{
+    _mbglMap->setBoundsConstraint(mbgl::LatLng(southWest.latitude, southWest.longitude), mbgl::LatLng(northEast.latitude, northEast.longitude));
+}
+
 - (MGLCoordinateBounds)visibleCoordinateBounds
 {
     return [self convertRect:self.bounds toCoordinateBoundsFromView:self];

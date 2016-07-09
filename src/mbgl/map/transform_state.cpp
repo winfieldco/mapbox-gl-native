@@ -355,4 +355,51 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     Cc = worldSize() / util::M2PI;
 }
 
+#pragma mark - Bounds
+
+void TransformState::constrainByBounds(double& scale_, double& x_, double& y_) const {
+
+    // Calculate a constraining bounding box
+    double scaleFactor = scale_ / scale;
+    double max_x = lngX(boundsConstraintNortheast.longitude) * scaleFactor;
+    double min_x = lngX(boundsConstraintSouthwest.longitude) * scaleFactor;
+    double min_y = latY(boundsConstraintNortheast.latitude) * scaleFactor;
+    double max_y = latY(boundsConstraintSouthwest.latitude) * scaleFactor;
+    
+    // Check if the requested zoom level fits in the constraining box, if not generate a scale factor to adjust the requesed zoom level by
+    double fitScaleFactor = height / fabs(max_y - min_y);
+    if (width / fabs(max_x - min_x) > fitScaleFactor) {
+        fitScaleFactor = width / fabs(max_x - min_x);
+    }
+    
+    // Adjust the new zoom level if necessary and update the constrained bounding box to the new scale
+    if (fitScaleFactor > 1.0) {
+        scale_ = scale_ * fitScaleFactor;
+        
+        scaleFactor = scale_ / scale;
+        max_x = lngX(boundsConstraintNortheast.longitude) * scaleFactor;
+        min_x = lngX(boundsConstraintSouthwest.longitude) * scaleFactor;
+        min_y = latY(boundsConstraintNortheast.latitude) * scaleFactor;
+        max_y = latY(boundsConstraintSouthwest.latitude) * scaleFactor;
+    }
+    
+    // Calculate the requested visible bounds to use when checking against the constraints
+    double x_left = x_ - (width / 2);
+    double x_right = x_ + (width / 2);
+    double y_bottom = y_ + (height / 2);
+    double y_top = y_ - (height / 2);
+    
+    // Check each side of the bounding box and constrain if necessary
+    // Only constrain x if necessary to allow continuous scroll if no user constraints are set
+    if (boundsConstraintNortheast.longitude < 180 || boundsConstraintSouthwest.longitude > -180) {
+        if (x_left < min_x) x_ = min_x + (width / 2);
+        if (x_right > max_x) x_ = max_x - (width / 2);
+    }
+    if (y_bottom > max_y) y_ = max_y - (height / 2);
+    if (y_top < min_y) y_ = min_y + (height / 2);
+  
+}
+
+
+
 } // namespace mbgl

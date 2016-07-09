@@ -191,6 +191,9 @@ public:
 
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
+  
+    // Bounds
+    void setBoundsConstraint(LatLng southwest, LatLng northeast);
 
 private:
     View& view;
