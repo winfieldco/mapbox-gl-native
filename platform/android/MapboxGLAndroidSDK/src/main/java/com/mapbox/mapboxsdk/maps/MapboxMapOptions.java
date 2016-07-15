@@ -23,6 +23,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
  */
 public class MapboxMapOptions implements Parcelable {
 
+    
     private static final float DIMENSION_SEVEN_DP = 7f;
     private static final float DIMENSION_TEN_DP = 10f;
     private static final float DIMENSION_SIXTEEN_DP = 16f;
