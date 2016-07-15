@@ -1003,6 +1003,10 @@ public class MapboxMap {
             deselectMarkers();
         }
 
+        // Add to selected prior, allowing us to remove selected markers in the callback
+        // if neccessary.
+        mSelectedMarkers.add(marker);
+
         boolean handledDefaultClick = false;
         if (mOnMarkerClickListener != null) {
             // end developer has provided a custom click listener
@@ -1015,7 +1019,7 @@ public class MapboxMap {
             }
         }
 
-        mSelectedMarkers.add(marker);
+
     }
 
     /**
