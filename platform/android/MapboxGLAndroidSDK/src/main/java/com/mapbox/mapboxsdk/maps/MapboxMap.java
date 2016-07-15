@@ -76,6 +76,10 @@ public class MapboxMap {
     private double mMaxZoomLevel = -1;
     private double mMinZoomLevel = -1;
 
+    // Track the max width and height for hit tracking
+    private float mMaxAnnotationImageWidth = 0;
+    private float mMaxAnnotationImageHeight = 0;
+
     MapboxMap(@NonNull MapView mapView) {
         mMapView = mapView;
         mMapView.addOnMapChangedListener(new MapChangeCameraPositionListener());
@@ -157,6 +161,14 @@ public class MapboxMap {
             return mMaxZoomLevel = mMapView.getMaxZoom();
         }
         return mMaxZoomLevel;
+    }
+
+    public float getMaxAnnotationImageWidth() {
+        return mMaxAnnotationImageWidth;
+    }
+
+    public float getMaxAnnotationImageHeight() {
+        return mMaxAnnotationImageHeight;
     }
 
     //
@@ -591,6 +603,12 @@ public class MapboxMap {
         long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
         marker.setId(id);
+
+        if(markerOptions.getMarker().getIcon() != null) {
+            mMaxAnnotationImageWidth = Math.max(markerOptions.getMarker().getIcon().getBitmap().getWidth(), mMaxAnnotationImageWidth);
+            mMaxAnnotationImageHeight = Math.max(markerOptions.getMarker().getIcon().getBitmap().getHeight(), mMaxAnnotationImageHeight);
+        }
+
         mAnnotations.put(id, marker);
         return marker;
     }

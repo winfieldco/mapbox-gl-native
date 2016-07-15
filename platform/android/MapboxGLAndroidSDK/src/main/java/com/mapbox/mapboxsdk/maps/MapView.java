@@ -92,6 +92,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -1577,6 +1578,7 @@ public class MapView extends FrameLayout {
         public boolean onSingleTapConfirmed(MotionEvent e) {
             // Open / Close InfoWindow
             PointF tapPoint = new PointF(e.getX(), e.getY());
+            final LatLng tapCoordinate = fromScreenLocation(tapPoint);
 
             List<Marker> selectedMarkers = mMapboxMap.getSelectedMarkers();
 
@@ -1587,11 +1589,27 @@ public class MapView extends FrameLayout {
             RectF tapRect = new RectF(tapPoint.x - toleranceSides, tapPoint.y + toleranceTop,
                     tapPoint.x + toleranceSides, tapPoint.y - toleranceBottom);
 
+
+            final float annotationImagePaddingForHitTest = 5;
+
+            // Instead use the iOS tap detection, which basically uses the max annotation
+            // image sizing to determine the detection bounds. See MGLMapView.mm, the function
+            // - (MGLAnnotationTag)annotationTagAtPoint:(CGPoint)point persistingResults:(BOOL)persist
+            // The code below basically just translates that code to Android.
+            tapRect = new RectF(
+              tapPoint.x - mMapboxMap.getMaxAnnotationImageWidth()/2 - annotationImagePaddingForHitTest,
+              tapPoint.y - mMapboxMap.getMaxAnnotationImageHeight()/2 - annotationImagePaddingForHitTest,
+              tapPoint.x + mMapboxMap.getMaxAnnotationImageWidth()/2 + annotationImagePaddingForHitTest,
+              tapPoint.y + mMapboxMap.getMaxAnnotationImageHeight()/2 + annotationImagePaddingForHitTest
+            );
+
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)));
             builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.top)));
             builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.top)));
             builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.bottom)));
+
+            ArrayList<Marker> newSelectedMarkers = new ArrayList<Marker>();
 
             List<Marker> nearbyMarkers = getMarkersInBounds(builder.build());
             long newSelectedMarkerId = -1;
@@ -1606,10 +1624,50 @@ public class MapView extends FrameLayout {
                         }
                     }
                     if (!found) {
-                        newSelectedMarkerId = nearbyMarker.getId();
-                        break;
+
+                        // Markers that are selected have to fit within their icon size, we eliminate
+                        // markers where the click is not within that markers bounds.
+                        PointF screenLocation = toScreenLocation(nearbyMarker.getPosition());
+
+                        if(tapPoint.x > screenLocation.x - nearbyMarker.getIcon().getBitmap().getWidth()/2) {
+                            if(tapPoint.x < screenLocation.x + nearbyMarker.getIcon().getBitmap().getWidth()/2) {
+                                if(tapPoint.y > screenLocation.y - nearbyMarker.getIcon().getBitmap().getWidth()/2) {
+                                    if (tapPoint.y < screenLocation.y + nearbyMarker.getIcon().getBitmap().getWidth()/2) {
+                                        newSelectedMarkers.add(nearbyMarker);
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
+            }
+
+            // Since we may have found more than one marker, we select the
+            // marker that is actually closest to the tap point.
+            Collections.sort(newSelectedMarkers, new Comparator<Marker>() {
+                @Override
+                public int compare(Marker a, Marker b) {
+                    double deltaA = Math.hypot(a.getPosition().getLatitude() - tapCoordinate.getLatitude(), a.getPosition().getLongitude() - tapCoordinate.getLongitude());
+                    double deltaB = Math.hypot(b.getPosition().getLatitude() - tapCoordinate.getLatitude(), b.getPosition().getLongitude() - tapCoordinate.getLongitude());
+
+                    if(deltaA == deltaB) {
+                        return 0;
+                    }
+                    else if(deltaA < deltaB) {
+                        return 1;
+                    }
+                    else {
+                        return -1;
+                    }
+
+                }
+            });
+
+            // Finally get the selected marker, which is the one that sorted to the top, meaning
+            // it was closest to the tap.
+            if(newSelectedMarkers.size() > 0) {
+                newSelectedMarkerId = newSelectedMarkers.get(0).getId();
             }
 
             if (newSelectedMarkerId >= 0) {
