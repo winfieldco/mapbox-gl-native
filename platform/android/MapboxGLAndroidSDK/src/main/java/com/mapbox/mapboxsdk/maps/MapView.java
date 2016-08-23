@@ -1572,7 +1572,7 @@ public class MapView extends FrameLayout {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
             return true;
-        }
+        }   
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -1648,6 +1648,10 @@ public class MapView extends FrameLayout {
             Collections.sort(newSelectedMarkers, new Comparator<Marker>() {
                 @Override
                 public int compare(Marker a, Marker b) {
+
+                    //double deltaA = calcDistance(a.getPosition(), tapCoordinate);
+                    //double deltaB = calcDistance(b.getPosition(), tapCoordinate);
+
                     double deltaA = Math.hypot(a.getPosition().getLatitude() - tapCoordinate.getLatitude(), a.getPosition().getLongitude() - tapCoordinate.getLongitude());
                     double deltaB = Math.hypot(b.getPosition().getLatitude() - tapCoordinate.getLatitude(), b.getPosition().getLongitude() - tapCoordinate.getLongitude());
 
@@ -1655,10 +1659,10 @@ public class MapView extends FrameLayout {
                         return 0;
                     }
                     else if(deltaA < deltaB) {
-                        return 1;
+                        return -1;
                     }
                     else {
-                        return -1;
+                        return 1;
                     }
 
                 }
