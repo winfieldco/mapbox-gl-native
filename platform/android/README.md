@@ -17,9 +17,14 @@ The Mapbox Android SDK requires Android 4.0.3+ (API level 15+).
 
 If you want to run the test app in the emulator, we recommend the x86 build because it will run a lot faster.
 
-First ensure you have an `MAPBOX_ACCESS_TOKEN` environment variable set, as described below. Then, create an x86 build:
+First ensure you have an `MAPBOX_ACCESS_TOKEN` environment variable set, as described below. Then, create a build for each architecture:
 
-    make android-lib-x86
+    make android-lib-x86 (x86)
+    make android-lib-x86-64 (x86 64-bit)
+    make android-lib-arm-v7 (arm)
+    make android-lib-arm-v8 (arm 64-bit)
+    
+You must create a build for each architecture, otherwise it will be missing in the eventually compiled apk file, missing file, libmapbox-gl.so. For instance on the Samsung S8 when you try to run the ARM64 version, it will have an error that the so file is missing, and when you unzip the APK you will find it is missing from the lib directory. By running make for each architecture you ensure that it will be copied over and available.    
 
 In Android Studio, create an x86 AVD (Android Virtual Device):
 
