@@ -3,11 +3,12 @@
 
 allprojects {
     repositories {
+        google()
         jcenter()
         maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+    gradleVersion = '4.10.1'
 }
