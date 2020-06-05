@@ -36,7 +36,7 @@ gradle.projectsEvaluated {
 }
 
 ext {
-    supportLibVersion = '23.1.1'
+    supportLibVersion = '28.0.0'
 }
 
 android {
