@@ -352,6 +352,7 @@ public final class UserLocationView extends View {
      */
     private void toggleGps(boolean enableGps) {
 
+        /* GPS location is no longer handled within mapbox so disable it
         LocationServices locationServices = LocationServices.getLocationServices(getContext());
 
         if (enableGps) {
@@ -376,6 +377,8 @@ public final class UserLocationView extends View {
         }
 
         locationServices.toggleGPS(enableGps);
+        */
+
     }
 
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
